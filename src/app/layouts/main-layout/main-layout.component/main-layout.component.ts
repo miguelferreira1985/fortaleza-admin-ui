@@ -6,6 +6,8 @@ import { HasRoleDirective } from '../../../core/directives/has-role.directive';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AuthService } from '../../../core/services/auth.service';
 import { CurrentUser } from '../../../shared/models/current-user';
+import { MatDialog } from '@angular/material/dialog';
+import { ChangePasswordDialogComponent } from '../../../features/change-password-dialog.component/change-password-dialog.component';
 
 @Component({
   selector: 'app-main-layout.component',
@@ -25,6 +27,7 @@ export class MainLayoutComponent implements OnInit {
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
   private autService = inject(AuthService);
+  private dialog = inject(MatDialog);
 
   currentUser: CurrentUser | null = null;
   expandedSection: string | null = 'inventory';
@@ -39,6 +42,21 @@ export class MainLayoutComponent implements OnInit {
 
   isSectionExpanded(section: string): boolean {
     return this.expandedSection === section;
+  }
+
+  openChangePasswordDialog(): void {
+    const user = this.currentUser;
+
+    if (!user) return;
+
+    this.dialog.open(ChangePasswordDialogComponent, {
+    width: '480px',
+    data: {
+      username: user.username,
+      userId: user.id
+    },
+    disableClose: true
+  });
   }
 
   logout(): void {

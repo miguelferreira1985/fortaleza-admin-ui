@@ -1,0 +1,60 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+  {{ isEditMode ? 'Editar Cliente' : 'Nuevo Cliente' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="clientForm">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name"
+        placeholder="Ej: Mercería El Hilo de Oro" maxlength="50">
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-hint align="end">{{ clientForm.get('name')?.value?.length || 0 }} / 50</mat-hint>
+      @if (hasError('name')) {
+        <mat-error>{{ getErrorMessage('name') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>RFC</mat-label>
+      <input matInput formControlName="rfc"
+        placeholder="Ej: XAXX010101000" maxlength="20"
+        style="text-transform: uppercase">
+      <mat-icon matPrefix>badge</mat-icon>
+      <mat-hint>Sin guiones ni espacios</mat-hint>
+      @if (hasError('rfc')) {
+        <mat-error>{{ getErrorMessage('rfc') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Teléfono</mat-label>
+      <input matInput formControlName="phone"
+        placeholder="Ej: 7351234567" maxlength="20">
+      <mat-icon matPrefix>phone</mat-icon>
+      <mat-hint>Opcional</mat-hint>
+      @if (hasError('phone')) {
+        <mat-error>{{ getErrorMessage('phone') }}</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="clientForm.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Guardar' : 'Crear' }}</span>
+    }
+  </button>
+</mat-dialog-actions>

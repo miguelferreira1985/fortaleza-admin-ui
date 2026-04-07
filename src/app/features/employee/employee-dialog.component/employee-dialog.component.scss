@@ -1,0 +1,93 @@
+.dialog-content {
+  padding: 8px 24px 16px;
+  min-width: 420px;
+
+  @media (max-width: 600px) {
+    min-width: unset;
+    padding: 8px 16px 16px;
+  }
+}
+
+// Título de sección dentro del dialog
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #880e4f;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 8px 0 12px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #e91e63;
+  }
+}
+
+.section-divider {
+  margin: 16px 0 !important;
+  border-color: #fce4ec !important;
+}
+
+// Checkbox de crear usuario
+.create-user-check {
+  display: block;
+  margin-bottom: 16px;
+  color: #880e4f;
+}
+
+// Sección de usuario — fondo rosa muy sutil
+.user-section {
+  background: #fff5f8;
+  border: 1px solid #f8bbd0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+// Fila de 2 columnas
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full-width { width: 100%; }
+.half-width { width: 100%; }
+
+// Botón submit
+.submit-btn {
+  min-width: 110px;
+  border-radius: 8px !important;
+  font-weight: 600;
+
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+// Acciones
+.dialog-actions {
+  padding: 8px 24px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #fce4ec;
+
+  button { border-radius: 8px !important; }
+}
+
+// Spinner
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spinner { animation: spin 1s linear infinite; }

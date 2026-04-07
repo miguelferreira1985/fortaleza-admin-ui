@@ -1,0 +1,71 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>tune</mat-icon>
+  Ajustar Stock
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p class="product-name-label">
+    <strong>{{ data.product.name }}</strong>
+    <span class="product-code">{{ data.product.code | uppercase }}</span>
+  </p>
+
+  <form [formGroup]="form">
+
+    <div class="stock-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Stock actual</mat-label>
+        <input matInput formControlName="previousStock" type="number" readonly>
+        <mat-icon matPrefix>inventory</mat-icon>
+      </mat-form-field>
+
+      <div class="arrow-icon">
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+
+      <mat-form-field appearance="outline"
+        [class.positive-stock]="newStockValue > data.product.stock"
+        [class.negative-stock]="newStockValue < data.product.stock">
+        <mat-label>Stock nuevo</mat-label>
+        <input matInput formControlName="newStock" type="number" readonly>
+        <mat-icon matPrefix>inventory_2</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Cantidad (positiva = entrada, negativa = salida)</mat-label>
+      <input matInput formControlName="quantity" type="number">
+      <mat-icon matPrefix>add_circle_outline</mat-icon>
+      <mat-hint>Usa negativo para salidas. Máx salida: {{ data.product.stock }}</mat-hint>
+      @if (form.hasError('zeroQuantity') && form.get('quantity')?.touched) {
+        <mat-error>La cantidad no puede ser 0</mat-error>
+      }
+      @if (form.hasError('negativeStock')) {
+        <mat-error>El stock no puede quedar negativo</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Justificación del movimiento</mat-label>
+      <input matInput formControlName="description" placeholder="Ej: Corrección de inventario físico">
+      <mat-icon matPrefix>notes</mat-icon>
+      @if (form.get('description')?.touched && form.get('description')?.hasError('required')) {
+        <mat-error>La justificación es obligatoria</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="form.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>save</mat-icon>
+      <span>Guardar</span>
+    }
+  </button>
+</mat-dialog-actions>

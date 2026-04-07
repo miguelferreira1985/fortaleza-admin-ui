@@ -40,52 +40,65 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/category/category.component/category.component').then(m => m.CategoryComponent),
         canActivate: [authGuard]
-      }/*
-      {
-        path: 'product',
-        loadComponent: () =>
-          import('./components/product-component/product-component').then(m => m.ProductComponent),
-        canActivate: [authGuard]
-      },*//*,
+      },
       {
         path: 'subcategory',
         loadComponent: () =>
-          import('./components/subcategory-component/subcategory-component').then(m => m.SubcategoryComponent),
-        canActivate: [authGuard]
-      },,
-      {
-        path: 'client',
-        loadComponent: () =>
-          import('./components/client-component/client-component').then(m => m.ClientComponent),
+          import('./features/subcategory/subcategory.component/subcategory.component').then(m => m.SubcategoryComponent),
         canActivate: [authGuard]
       },
       {
-        path: 'supplier',
+        path: 'client',
         loadComponent: () =>
-          import('./components/supplier-component/supplier-component').then(m => m.SupplierComponent),
+          import('./features/client/client.component/client.component').then(m => m.ClientComponent),
         canActivate: [authGuard]
       },
       {
         path: 'employee',
         loadComponent: () =>
-          import('./components/employee-component/employee-component').then(m => m.EmployeeComponent),
+          import('./features/employee/employee.component/employee.component').then(m => m.EmployeeComponent),
         canActivate: [authGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
       },
       {
+        path: 'supplier',
+        loadComponent: () =>
+          import('./features/supplier/supplier.component/supplier.component').then(m => m.SupplierComponent),
+        canActivate: [authGuard]
+      },
+      {
         path: 'inventory-movement',
         loadComponent: () =>
-          import('./components/inventory-movement-component/inventory-movement-component').then(m => m.InventoryMovementComponent),
+          import('./features/inventory-movement/inventory-movement.component').then(m => m.InventoryMovementComponent),
         canActivate: [authGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
       },
       {
         path: 'user',
         loadComponent: () =>
-          import('./components/user-component/user-component').then(m => m.UserComponent),
+          import('./features/user/user.component/user.component').then(m => m.UserComponent),
         canActivate: [authGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
       },
+      {
+        path: 'product',
+        loadComponent: () => import('./features/products/product.component/product.component').then(m => m.ProductComponent)
+      },
+      {
+        path: 'product/new',
+        loadComponent: () => import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent)
+      },
+      {
+        path: 'product/edit/:id',
+        loadComponent: () => import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent)
+      }/*
+      {
+        path: 'product',
+        loadComponent: () =>
+          import('./components/product-component/product-component').then(m => m.ProductComponent),
+        canActivate: [authGuard]
+      },*//*,,,,,
+,,
       {
         path: 'suppliers/:supplierId/purchase-orders',
         loadComponent: () =>

@@ -1,0 +1,174 @@
+// ===== HEADER DE LA PÁGINA =====
+.form-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .back-btn { color: #e91e63; }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #880e4f;
+      margin: 0;
+    }
+
+    .header-subtitle { font-size: 0.85rem; color: #ad1457; }
+  }
+
+  .save-btn-header {
+    height: 44px; font-weight: 600; border-radius: 8px !important;
+    ::ng-deep .mdc-button__label { display: flex; align-items: center; gap: 6px; }
+  }
+}
+
+.page-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 60px; gap: 16px;
+  p { color: #ad1457; }
+}
+
+// ===== CARDS DEL FORMULARIO =====
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-bottom: 100px; // Espacio para los botones flotantes
+}
+
+.form-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07) !important;
+
+  mat-card-header {
+    padding: 16px 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    mat-card-title {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      color: #880e4f;
+
+      mat-icon { font-size: 20px; width: 20px; height: 20px; color: #e91e63; }
+    }
+  }
+
+  mat-card-content { padding: 16px 20px 20px !important; }
+
+  .card-header-actions { margin-left: auto; }
+}
+
+// ===== LAYOUTS DE CAMPOS =====
+.form-row-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.form-row-3 {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.form-row-5 {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 768px) { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.full-width { width: 100%; }
+
+// ===== SECCIÓN DE PROVEEDORES =====
+.no-suppliers {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; padding: 24px; color: #ad1457;
+  mat-icon { font-size: 2.5rem; width: 2.5rem; height: 2.5rem; opacity: 0.4; }
+  p { margin: 0; font-size: 0.9rem; }
+}
+
+.supplier-table-header {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr 1fr 40px;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fce4ec;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #880e4f;
+
+  @media (max-width: 900px) { display: none; }
+}
+
+.supplier-row {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr 1fr 40px;
+  gap: 8px;
+  align-items: start;
+  padding: 4px 0;
+  border-bottom: 1px solid #fce4ec;
+
+  mat-form-field { width: 100%; }
+
+  .supplier-select { }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px;
+    background: #fff5f8;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #fce4ec;
+  }
+}
+
+.add-supplier-btn {
+  border-color: #e91e63 !important;
+  color: #e91e63 !important;
+  border-radius: 8px !important;
+}
+
+.duplicate-error {
+  display: flex; align-items: center; gap: 6px;
+  color: #c62828; font-size: 0.85rem; margin-top: 8px;
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+// ===== BOTONES FLOTANTES =====
+.form-actions {
+  position: fixed;
+  bottom: 0; right: 0; left: 230px; // 230px = ancho del sidebar
+  background: white;
+  border-top: 1px solid #fce4ec;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 -4px 12px rgba(233, 30, 99, 0.1);
+
+  @media (max-width: 768px) { left: 0; }
+
+  .submit-btn {
+    min-width: 160px; height: 44px; font-weight: 600; border-radius: 8px !important;
+    ::ng-deep .mdc-button__label { display: flex; align-items: center; gap: 6px; }
+  }
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinner { animation: spin 1s linear infinite; }

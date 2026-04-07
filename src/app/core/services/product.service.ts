@@ -57,4 +57,8 @@ export class ProductService {
       return this.http.patch<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}/stock`, stockRequestDto);
     }
 
+    getProductById(id: number): Observable<ApiResponse<Product>> {
+      return this.http.get<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}`);
+    }
+
 }

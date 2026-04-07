@@ -1,0 +1,181 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'person_add' }}</mat-icon>
+  {{ isEditMode ? 'Editar Empleado' : 'Nuevo Empleado' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="employeeForm">
+
+    <!-- ===== SECCIÓN: DATOS PERSONALES ===== -->
+    <div class="section-title">
+      <mat-icon>person</mat-icon>
+      <span>Datos personales</span>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Nombre(s)</mat-label>
+        <input matInput formControlName="firstName" placeholder="Ej: Miguel" maxlength="50">
+        <mat-hint align="end">{{ employeeForm.get('firstName')?.value?.length || 0 }} / 50</mat-hint>
+        @if (hasError('firstName')) {
+          <mat-error>{{ getErrorMessage('firstName') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Apellidos</mat-label>
+        <input matInput formControlName="lastName" placeholder="Ej: Ferreira" maxlength="50">
+        <mat-hint align="end">{{ employeeForm.get('lastName')?.value?.length || 0 }} / 50</mat-hint>
+        @if (hasError('lastName')) {
+          <mat-error>{{ getErrorMessage('lastName') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Dirección</mat-label>
+      <input matInput formControlName="address" placeholder="Ej: Calle Principal #123" maxlength="100">
+      <mat-icon matPrefix>home</mat-icon>
+      <mat-hint align="end">{{ employeeForm.get('address')?.value?.length || 0 }} / 100</mat-hint>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="phone" placeholder="Ej: 7351234567">
+        <mat-icon matPrefix>phone</mat-icon>
+        @if (hasError('phone')) {
+          <mat-error>{{ getErrorMessage('phone') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" placeholder="Ej: miguel@correo.com" type="email">
+        <mat-icon matPrefix>email</mat-icon>
+        @if (hasError('email')) {
+          <mat-error>{{ getErrorMessage('email') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>NSS</mat-label>
+      <input matInput formControlName="ssn" placeholder="Número de Seguridad Social" maxlength="20">
+      <mat-icon matPrefix>credit_card</mat-icon>
+      <mat-hint>Opcional</mat-hint>
+    </mat-form-field>
+
+    <!-- ===== SECCIÓN: USUARIO DEL SISTEMA (solo en creación) ===== -->
+    @if (!isEditMode) {
+      <mat-divider class="section-divider" />
+
+      <div class="section-title">
+        <mat-icon>manage_accounts</mat-icon>
+        <span>Usuario del sistema</span>
+      </div>
+
+      <!-- 👈 Checkbox para activar la sección -->
+      <mat-checkbox formControlName="createUser" color="primary" class="create-user-check">
+        Crear usuario del sistema para este empleado
+      </mat-checkbox>
+
+      <!-- Campos de usuario — solo si el checkbox está activado -->
+@if (showUserSection) {
+  <div class="user-section">
+
+    <div class="form-row">
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Nombre de usuario</mat-label>
+        <input matInput formControlName="username"
+          placeholder="Ej: mferreira" maxlength="20">
+        <mat-icon matPrefix>account_circle</mat-icon>
+        @if (hasError('username')) {
+          <mat-error>{{ getErrorMessage('username') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Permisos</mat-label>
+        <mat-select formControlName="roles" multiple>
+          @for (role of roles; track role.id) {
+            <mat-option [value]="role.id">
+              <mat-icon style="font-size:16px;margin-right:6px">
+                {{ role.id === 'admin' ? 'admin_panel_settings' : role.id === 'manager' ? 'supervisor_account' : 'point_of_sale' }}
+              </mat-icon>
+              {{ role.name }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>security</mat-icon>
+        @if (hasError('roles')) {
+          <mat-error>Selecciona al menos un permiso</mat-error>
+        }
+      </mat-form-field>
+
+    </div>
+
+    <div class="form-row">
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Contraseña</mat-label>
+        <input matInput formControlName="password"
+          [type]="hidePassword ? 'password' : 'text'"
+          autocomplete="new-password">
+        <mat-icon matPrefix>lock</mat-icon>
+        <button mat-icon-button matSuffix type="button"
+          (click)="hidePassword = !hidePassword"
+          [matTooltip]="hidePassword ? 'Mostrar' : 'Ocultar'">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-hint>Mínimo 8 caracteres</mat-hint>
+        @if (hasError('password')) {
+          <mat-error>{{ getErrorMessage('password') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Confirmar contraseña</mat-label>
+        <input matInput formControlName="confirmPassword"
+          [type]="hideConfirmPassword ? 'password' : 'text'"
+          autocomplete="new-password">
+        <mat-icon matPrefix>lock_outline</mat-icon>
+        <button mat-icon-button matSuffix type="button"
+          (click)="hideConfirmPassword = !hideConfirmPassword"
+          [matTooltip]="hideConfirmPassword ? 'Mostrar' : 'Ocultar'">
+          <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (hasError('confirmPassword') || employeeForm.hasError('passwordMismatch')) {
+          <mat-error>
+            {{ employeeForm.hasError('passwordMismatch')
+              ? 'Las contraseñas no coinciden'
+              : getErrorMessage('confirmPassword') }}
+          </mat-error>
+        }
+      </mat-form-field>
+
+    </div>
+
+  </div>
+}
+    }
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="employeeForm.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Guardar' : 'Crear' }}</span>
+    }
+  </button>
+</mat-dialog-actions>

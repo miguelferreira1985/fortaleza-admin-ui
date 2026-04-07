@@ -1,0 +1,87 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+  {{ isEditMode ? 'Editar Subcategoría' : 'Nueva Subcategoría' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="subcategoryForm">
+
+    <!-- Nombre -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name" placeholder="Ej: Hilos de Algodón" maxlength="50">
+      <mat-icon matPrefix>label</mat-icon>
+      <mat-hint align="end">{{ subcategoryForm.get('name')?.value?.length || 0 }} / 50</mat-hint>
+      @if (hasError('name')) {
+        <mat-error>{{ getErrorMessage('name') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Categoría con Autocomplete 👈 -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Categoría</mat-label>
+      <input
+        matInput
+        formControlName="categoryObj"
+        [matAutocomplete]="autoCat"
+        placeholder="Escribe para buscar..."
+      >
+      <mat-icon matPrefix>layers</mat-icon>
+
+      <!-- Botón para limpiar la selección -->
+      @if (subcategoryForm.get('categoryObj')?.value) {
+        <button mat-icon-button matSuffix type="button"
+          (click)="subcategoryForm.patchValue({ categoryObj: null, categoryId: null })">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+
+      <!-- Panel del autocomplete -->
+      <mat-autocomplete
+        #autoCat="matAutocomplete"
+        [displayWith]="displayCategory">
+        @for (cat of filteredCategories; track cat.id) {
+          <mat-option [value]="cat">
+            {{ cat.name | uppercase }}
+          </mat-option>
+        }
+        @if (filteredCategories.length === 0) {
+          <mat-option disabled>Sin resultados</mat-option>
+        }
+      </mat-autocomplete>
+
+      <mat-hint>Opcional — deja vacío si no aplica</mat-hint>
+    </mat-form-field>
+
+    <!-- Descripción -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Descripción opcional..."
+        rows="3"
+        maxlength="200">
+      </textarea>
+      <mat-icon matPrefix>notes</mat-icon>
+      <mat-hint align="end">{{ subcategoryForm.get('description')?.value?.length || 0 }} / 200</mat-hint>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="subcategoryForm.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Guardar' : 'Crear' }}</span>
+    }
+  </button>
+</mat-dialog-actions>

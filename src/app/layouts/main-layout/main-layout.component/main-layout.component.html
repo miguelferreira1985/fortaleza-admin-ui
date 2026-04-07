@@ -5,7 +5,7 @@
 
     <!-- Logo / Brand -->
     <div class="sidenav-brand" routerLink="/dashboard">
-      <img src="/assets/images/FortalezaLogo.png" alt="La Fortaleza" class="brand-logo" />
+      <img src="/assets/images/FortalezaLogoBlanco.jpeg" alt="La Fortaleza" class="brand-logo" />
       <span class="brand-text">La Fortaleza<br><small>ADMIN</small></span>
     </div>
 
@@ -172,7 +172,7 @@
 
             <button
                 mat-menu-item
-                routerLink="/change-password">
+                (click)="openChangePasswordDialog()">
               <mat-icon>lock_reset</mat-icon>
               Cambiar contraseña
             </button>

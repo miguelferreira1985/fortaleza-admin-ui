@@ -59,7 +59,7 @@ export class CategoryDialogComponent {
       this.categoryForm.patchValue({
         id: this.data.category.id,
         name: this.data.category.name,
-        abbreviation: this.data.category.description
+        description: this.data.category.description
       });
     }
   }

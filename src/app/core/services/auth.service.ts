@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import { CurrentUser } from '../../shared/models/current-user';
 
 interface JwtPayload {
+  userId: number;
   sub: string;
   role: string[];
   exp: number;
@@ -87,10 +88,12 @@ export class AuthService {
 
     try {
       const decoded = jwtDecode<JwtPayload>(token);
+      const id = decoded.userId;
       const firstName = decoded.firstName || '';
       const lastName = decoded.lastName || '';
 
       return {
+        id: id,
         username: decoded.sub,
         firstName,
         lastName,
