@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from '../../shared/material-module';
+import { MaterialModule } from '../../../shared/material-module';
 import { MatTableDataSource } from '@angular/material/table';
-import { Presentation } from '../../shared/models/presentation';
+import { Presentation } from '../../../shared/models/presentation';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { PresentationService } from '../../core/services/presentation.service';
-import { NotificationService } from '../../core/services/notification.service';
+import { PresentationService } from '../../../core/services/presentation.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresentationDialogComponent } from '../presentation-dialog/presentation-dialog.component';
 
@@ -21,19 +21,20 @@ import { PresentationDialogComponent } from '../presentation-dialog/presentation
   templateUrl: './presentation.component.html',
   styleUrl: './presentation.component.scss',
 })
-export class PresentationComponent implements OnInit {
+export class PresentationComponent implements OnInit, AfterViewInit {
 
   private presentationService = inject(PresentationService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
 
-  dataSource!: MatTableDataSource<Presentation>;
+  dataSource = new MatTableDataSource<Presentation>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   searchTerm: string = '';
   isLoading: boolean = false;
+  totalItems = 0;
 
   displayedColumns: string[] = ['name', 'abbreviation', 'actions'];
 
@@ -41,14 +42,19 @@ export class PresentationComponent implements OnInit {
     this.loadPresentations();
   }
 
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
   loadPresentations(): void {
     this.isLoading = true;
 
     this.presentationService.getAllPresentations().subscribe({
       next: (data) => {
-        this.dataSource = new MatTableDataSource(data);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+        this.dataSource.data = data;
+        this.totalItems = data.length;
+
         this.dataSource.filterPredicate = (data: Presentation, filter: string) => {
           const searchStr = filter.toLowerCase();
           return data.name.toLowerCase().includes(searchStr) || data.abbreviation.toLowerCase().includes(searchStr);

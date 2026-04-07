@@ -32,7 +32,13 @@ export const routes: Routes = [
       {
         path: 'presentation',
         loadComponent: () =>
-          import('./features/presentation-component/presentation.component').then(m => m.PresentationComponent),
+          import('./features/presentation/presentation-component/presentation.component').then(m => m.PresentationComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'category',
+        loadComponent: () =>
+          import('./features/category/category.component/category.component').then(m => m.CategoryComponent),
         canActivate: [authGuard]
       }/*
       {
@@ -46,13 +52,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/subcategory-component/subcategory-component').then(m => m.SubcategoryComponent),
         canActivate: [authGuard]
-      },
-      {
-        path: 'category',
-        loadComponent: () =>
-          import('./components/category-component/category-component').then(m => m.CategoryComponent),
-        canActivate: [authGuard]
-      },
+      },,
       {
         path: 'client',
         loadComponent: () =>

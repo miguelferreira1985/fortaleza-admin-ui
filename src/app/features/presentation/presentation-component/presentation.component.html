@@ -1,6 +1,9 @@
 <!-- ===== HEADER ===== -->
 <div class="page-header">
-  <h1>Gestión de Presentaciones</h1>
+  <h1>
+    <mat-icon>straighten</mat-icon>
+    Gestión de Presentaciones
+  </h1>
 </div>
 
 <!-- ===== TARJETA PRINCIPAL ===== -->
@@ -10,6 +13,9 @@
   <div class="toolbar">
     <div class="toolbar-left">
       <h2>Lista de Presentaciones</h2>
+      <span class="total-badge">
+        {{ totalItems }} {{ totalItems === 1 ? 'registro' : 'registros' }}
+      </span>
     </div>
 
     <div class="toolbar-right">
@@ -37,20 +43,21 @@
   </div>
 
   <!-- ===== TABLA ===== -->
-  <div class="table-container">
+  <div class="table-wrapper">
 
     <!-- Loader mientras carga -->
-    <div *ngIf="isLoading" class="loading-spinner">
-      <mat-spinner></mat-spinner>
-    </div>
-
-    <!-- Tabla con datos -->
-    <table
+    @if (isLoading) {
+      <div class="loading-overlay">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    }
+          <!-- Tabla con datos -->
+    <div class="table-scroll">
+          <table
       mat-table
       [dataSource]="dataSource"
       matSort
-      class="presentations-table"
-      *ngIf="!isLoading && dataSource">
+      class="presentations-table">
 
       <!-- COLUMNA: Nombre -->
       <ng-container matColumnDef="name">
@@ -99,7 +106,7 @@
       </ng-container>
 
       <!-- Definición de filas -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr
         mat-row
         *matRowDef="let row; columns: displayedColumns;"
@@ -109,20 +116,22 @@
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
           <div class="no-data-message">
-            <mat-icon>info</mat-icon>
-            <p>{{ searchTerm ? 'No se encontraron resultados' : 'No hay presentaciones registradas' }}</p>
+            <mat-icon>search_off</mat-icon>
+            <p>{{ searchTerm ? 'Sin resultados para "' + searchTerm + '"' : 'No hay presentaciones registradas' }}</p>
           </div>
         </td>
       </tr>
 
     </table>
+    </div>
+  
 
     <!-- Paginador -->
     <mat-paginator
-      *ngIf="!isLoading && dataSource"
       [pageSizeOptions]="[5, 10, 25, 50]"
       [pageSize]="10"
-      showFirstLastButtons>
+      showFirstLastButtons
+      aria-label="Seleccionar página">
     </mat-paginator>
 
   </div>

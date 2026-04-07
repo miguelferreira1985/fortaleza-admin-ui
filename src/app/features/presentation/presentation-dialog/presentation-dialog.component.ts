@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaterialModule } from '../../shared/material-module';
-import { PresentationService } from '../../core/services/presentation.service';
-import { NotificationService } from '../../core/services/notification.service';
-import { Presentation } from '../../shared/models/presentation';
+import { MaterialModule } from '../../../shared/material-module';
+import { PresentationService } from '../../../core/services/presentation.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { Presentation } from '../../../shared/models/presentation';
 
 export interface PresentationDialogData {
   presentation: Presentation | null;

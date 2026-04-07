@@ -31,6 +31,9 @@
   border-radius: 12px; // 👈 Más redondeado, igual que las cards del dashboard
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 180px);
 }
 
 // ===== TOOLBAR =====
@@ -44,11 +47,22 @@
   flex-wrap: wrap;
 
   .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
     h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
       margin: 0;
-      color: #880e4f; // 👈 Pink-900
+    }
+
+    .total-badge {
+      background: #fce4ec;
+      color: #880e4f;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid #f8bbd0;
     }
   }
 
@@ -80,17 +94,37 @@
 }
 
 // ===== TABLA =====
-.table-container {
+.table-wrapper {
   width: 100%;
   position: relative;
-  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  .presentations-table {
+    width: 100%;
+  }
 }
 
-.loading-spinner {
+.table-scroll {
+  overflow-y: auto;
+  max-height: calc(100vh - 330px);
+  flex: 1;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 300px;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 20;
+  min-height: 200px;
+  border-radius: 0 0 12px 12px;
 }
 
 .presentations-table {
@@ -174,6 +208,7 @@
 mat-paginator {
   border-top: 1px solid #fce4ec; // 👈 Pink-50
   background: #fff5f8; // Rosa muy sutil
+  flex-shrink: 0;;
 }
 
 // ===== RESPONSIVE =====
