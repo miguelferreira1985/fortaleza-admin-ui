@@ -1,6 +1,6 @@
 {
   "buildCommand": "ng build --configuration=qa",
-  "outputDirectory": "dist/fortaleza-admin-ui",
+  "outputDirectory": "dist/fortaleza-admin-ui/browser",
   "rewrites": [
     {
       "source": "/(.*)",
