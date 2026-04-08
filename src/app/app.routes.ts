@@ -82,53 +82,48 @@ export const routes: Routes = [
       },
       {
         path: 'product',
-        loadComponent: () => import('./features/products/product.component/product.component').then(m => m.ProductComponent)
+        loadComponent: () =>
+          import('./features/products/product.component/product.component').then(m => m.ProductComponent),
+        canActivate: [authGuard]
       },
       {
         path: 'product/new',
-        loadComponent: () => import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent)
+        loadComponent: () =>
+          import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent),
+        canActivate: [authGuard]
       },
       {
         path: 'product/edit/:id',
-        loadComponent: () => import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent)
-      }/*
-      {
-        path: 'product',
         loadComponent: () =>
-          import('./components/product-component/product-component').then(m => m.ProductComponent),
+          import('./features/products/product-form.component/product-form.component').then(m => m.ProductFormComponent),
         canActivate: [authGuard]
-      },*//*,,,,,
-,,
-      {
-        path: 'suppliers/:supplierId/purchase-orders',
+      },
+      { path: 'purchase-orders',
         loadComponent: () =>
-          import('./components/supplier-purchase-orders/supplier-purchase-orders.component').then(m => m.SupplierPurchaseOrdersComponent),
+          import('./features/purchase-orders/purchase-order-list.component/purchase-order-list.component').then(m => m.PurchaseOrderListComponent),
+        canActivate: [authGuard]
+      },
+      { path: 'purchase-orders/:id',
+        loadComponent: () =>
+          import('./features/purchase-orders/purchase-order-detail.component/purchase-order-detail.component').then(m => m.PurchaseOrderDetailComponent),
+        canActivate: [authGuard]
+      },
+      { path: 'purchase-orders/:id/receive',
+        loadComponent: () =>
+          import('./features/purchase-orders/purchase-order-receive.component/purchase-order-receive.component') .then(m => m.PurchaseOrderReceiveComponent),
+        canActivate: [authGuard]
+      },
+      { path: 'suppliers/:supplierId/purchase-orders',
+        loadComponent: () =>
+          import('./features/purchase-orders/supplier-purchase-order.component/supplier-purchase-order.component').then(m => m.SupplierPurchaseOrderComponent),
         canActivate: [authGuard]
       },
       {
-        path: 'purchase-orders',
+        path: 'purchase-orders/:id/edit',
         loadComponent: () =>
-          import('./components/purchase-order-list/purchase-order-list.component').then(m => m.PurchaseOrderListComponent),
+          import('./features/purchase-orders/purchase-order-edit.component/purchase-order-edit.component').then(m => m.PurchaseOrderEditComponent),
         canActivate: [authGuard]
-      },
-      {
-        path: 'purchase-orders/:id',
-        loadComponent: () =>
-          import('./components/purchase-order-detail-component/purchase-order-detail.component').then(m => m.PurchaseOrderDetailComponent),
-        canActivate: [authGuard]
-      },
-      {
-        path: 'suppliers/:supplierId/purchase-orders/:id',
-        loadComponent: () =>
-          import('./components/purchase-order-detail-component/purchase-order-detail.component').then(m => m.PurchaseOrderDetailComponent),
-        canActivate: [authGuard]
-      },
-      {
-        path: 'purchase-orders/:id/receive',
-        loadComponent: () =>
-          import('./components/purchase-order-receive/purchase-order-receive.component').then(m => m.PurchaseOrderReceiveComponent),
-        canActivate: [authGuard]
-      } */
+      }
     ]
   }
 ];

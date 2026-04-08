@@ -34,4 +34,8 @@ export class PurchaseOrderService {
     return this.http.put<ApiResponse<PurchaseOrder>>(`${this.baseUrl}/${orderId}/status`, request);
   }
 
+  updateOldOrder(id: number, dto: any): Observable<any> {
+  return this.http.put<any>(`${this.baseUrl}/${id}`, dto);
+}
+
 }

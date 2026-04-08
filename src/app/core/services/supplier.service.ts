@@ -48,4 +48,8 @@ export class SupplierService {
       .get<ApiResponse<Product[]>>(`${this.apiUrl}${this.apiPath}/${id}/products`, { params });
   }
 
+    getSupplierById(id: number): Observable<ApiResponse<Supplier>> {
+    return this.http.get<ApiResponse<Supplier>>(`${this.apiUrl}${this.apiPath}/${id}`);
+  }
+
 }
