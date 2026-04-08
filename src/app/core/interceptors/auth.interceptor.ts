@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { environment } from '../../../environment/environment';
+import { environment } from '../../../environments/environment';
 import { BehaviorSubject, catchError, filter, switchMap, throwError, take } from 'rxjs';
 
 const AUTH_BASE = `${environment.apiUrl}/auth`;
