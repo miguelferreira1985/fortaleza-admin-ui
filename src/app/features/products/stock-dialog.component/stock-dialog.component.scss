@@ -1,0 +1,39 @@
+.dialog-content {
+  padding: 8px 24px 16px;
+  min-width: 420px;
+}
+
+.product-name-label {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 0 16px; font-size: 0.95rem;
+  strong { color: #880e4f; }
+  .product-code {
+    font-family: 'Courier New', monospace; font-size: 0.82rem;
+    background: #fce4ec; color: #880e4f; padding: 2px 8px; border-radius: 8px;
+  }
+}
+
+.stock-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+  mat-form-field { flex: 1; }
+  .arrow-icon { color: #e91e63; }
+}
+
+::ng-deep .positive-stock input { color: #2e7d32 !important; font-weight: 700; }
+::ng-deep .negative-stock input { color: #c62828 !important; font-weight: 700; }
+
+.full-width { width: 100%; margin-bottom: 4px; }
+
+.dialog-actions {
+  padding: 8px 24px 16px; display: flex; justify-content: flex-end; gap: 8px;
+  border-top: 1px solid #fce4ec;
+  button { border-radius: 8px !important; }
+}
+
+.submit-btn {
+  min-width: 110px; font-weight: 600;
+  ::ng-deep .mdc-button__label { display: flex; align-items: center; gap: 6px; }
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinner { animation: spin 1s linear infinite; }

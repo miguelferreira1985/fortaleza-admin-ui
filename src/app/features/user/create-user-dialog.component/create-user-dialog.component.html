@@ -1,0 +1,109 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>person_add</mat-icon>
+  Agregar Usuario
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form">
+
+    <!-- Autocomplete de empleado -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Empleado</mat-label>
+      <input matInput formControlName="employeeObj"
+        [matAutocomplete]="autoEmp"
+        placeholder="Busca por nombre...">
+      <mat-icon matPrefix>badge</mat-icon>
+      <mat-autocomplete #autoEmp="matAutocomplete" [displayWith]="displayEmployee">
+        @for (emp of filteredEmployees; track emp.id) {
+          <mat-option [value]="emp">{{ emp.fullName }}</mat-option>
+        }
+        @if (filteredEmployees.length === 0) {
+          <mat-option disabled>Sin empleados sin usuario</mat-option>
+        }
+      </mat-autocomplete>
+      <mat-hint>Solo empleados sin usuario asignado</mat-hint>
+      @if (hasError('employeeObj')) {
+        <mat-error>Selecciona un empleado</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Campos que aparecen al seleccionar empleado -->
+    @if (showFields) {
+      <mat-divider class="section-divider" />
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre de usuario</mat-label>
+        <input matInput formControlName="username" placeholder="Ej: mferreira">
+        <mat-icon matPrefix>account_circle</mat-icon>
+        @if (hasError('username')) {
+          <mat-error>{{ getErrorMessage('username') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Permisos</mat-label>
+        <mat-select formControlName="roles" multiple>
+          @for (role of roles; track role.id) {
+            <mat-option [value]="role.id">
+                {{ role.name }}
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>security</mat-icon>
+        @if (hasError('roles')) {
+          <mat-error>Selecciona al menos un permiso</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput formControlName="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button"
+            (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-hint>Mínimo 8 caracteres</mat-hint>
+          @if (hasError('password')) {
+            <mat-error>{{ getErrorMessage('password') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput formControlName="confirmPassword"
+            [type]="hideConfirmPassword ? 'password' : 'text'"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <button mat-icon-button matSuffix type="button"
+            (click)="hideConfirmPassword = !hideConfirmPassword">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (hasError('confirmPassword') || form.hasError('passwordMismatch')) {
+            <mat-error>
+              {{ form.hasError('passwordMismatch') ? 'Las contraseñas no coinciden' : getErrorMessage('confirmPassword') }}
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+    }
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="form.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>add</mat-icon>
+      <span>Crear</span>
+    }
+  </button>
+</mat-dialog-actions>

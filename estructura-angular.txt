@@ -1,0 +1,41 @@
+.
+├── .editorconfig
+├── .gitignore
+├── .vscode
+│   ├── extensions.json
+│   ├── launch.json
+│   └── tasks.json
+├── angular.json
+├── estructura-angular.txt
+├── package-lock.json
+├── package.json
+├── public
+│   └── favicon.ico
+├── README.md
+├── src
+│   ├── app
+│   │   ├── app.config.ts
+│   │   ├── app.html
+│   │   ├── app.routes.ts
+│   │   ├── app.scss
+│   │   ├── app.spec.ts
+│   │   ├── app.ts
+│   │   ├── core
+│   │   │   ├── guards
+│   │   │   ├── interceptors
+│   │   │   └── services
+│   │   ├── features
+│   │   │   ├── auth
+│   │   │   └── dashboard
+│   │   └── shared
+│   │       ├── components
+│   │       ├── material-module.ts
+│   │       └── models
+│   ├── index.html
+│   ├── main.ts
+│   └── styles.scss
+├── tsconfig.app.json
+├── tsconfig.json
+└── tsconfig.spec.json
+
+15 directories, 24 files
