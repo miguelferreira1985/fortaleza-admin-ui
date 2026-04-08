@@ -45,7 +45,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Nombre</mat-label>
           <input matInput formControlName="name" placeholder="Ej: Hilo de Algodón Blanco" maxlength="50">
-          <mat-hint align="end">{{ c('name').value?.length || 0 }} / 50</mat-hint>
+          <mat-hint align="end">{{ c('name').value?.length || 0 }} / 100</mat-hint>
           @if (c('name').touched && c('name').hasError('required')) {
             <mat-error>El nombre es obligatorio</mat-error>
           }
@@ -54,7 +54,7 @@
         <mat-form-field appearance="outline">
           <mat-label>Clave</mat-label>
           <input matInput formControlName="code" placeholder="Ej: HIL-ALG-001" maxlength="20" style="text-transform:uppercase">
-          <mat-hint align="end">{{ c('code').value?.length || 0 }} / 20</mat-hint>
+          <mat-hint align="end">{{ c('code').value?.length || 0 }} / 50</mat-hint>
           @if (c('code').touched && c('code').hasError('required')) {
             <mat-error>La clave es obligatoria</mat-error>
           }

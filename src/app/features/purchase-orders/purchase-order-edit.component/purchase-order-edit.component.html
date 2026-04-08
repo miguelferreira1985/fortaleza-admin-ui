@@ -1,0 +1,181 @@
+<div class="form-page-header">
+  <div class="header-left">
+    <button mat-icon-button (click)="goBack()" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1>Editar Orden de Compra</h1>
+      @if (order) {
+        <span class="header-subtitle">
+          Folio #{{ order.id?.toString().padStart(4, '0') }} —
+          <span class="po-status-chip" [ngClass]="getStatusConfig(order.status).cssClass">
+            <mat-icon>{{ getStatusConfig(order.status).icon }}</mat-icon>
+            {{ getStatusConfig(order.status).label }}
+          </span>
+        </span>
+      }
+    </div>
+  </div>
+
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="form.invalid || isSaving" class="save-btn-header">
+    @if (isSaving) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>save</mat-icon>
+      <span>Guardar cambios</span>
+    }
+  </button>
+</div>
+
+@if (isLoading) {
+  <div class="loading-state">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando orden...</p>
+  </div>
+} @else if (order) {
+
+  <form [formGroup]="form" class="edit-form">
+
+    <!-- ===== FECHA ESTIMADA ===== -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>calendar_today</mat-icon>
+          Fecha estimada de entrega
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="date-field">
+          <mat-label>Fecha estimada de entrega</mat-label>
+          <input matInput [matDatepicker]="picker"
+            formControlName="expectedDeliveryDate" readonly>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ===== PRODUCTOS ===== -->
+    <mat-card class="form-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>inventory</mat-icon>
+          Productos de la orden
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <!-- Encabezado de columnas -->
+        <div class="items-header">
+          <span>Producto</span>
+          <span>Cant. ordenada</span>
+          <span>Costo sin IVA</span>
+          <span>Costo con IVA</span>
+          <span>Subtotal c/ IVA</span>
+          <span></span>
+        </div>
+
+        <div formArrayName="items">
+          @for (itemCtrl of itemsArray.controls; track $index) {
+            <div [formGroupName]="$index" class="item-row"
+              [class.has-received]="itemCtrl.get('quantityReceived')?.value > 0">
+
+              <!-- Nombre del producto -->
+              <div class="product-cell">
+                <strong>{{ itemCtrl.get('productName')?.value }}</strong>
+                <small class="supplier-code">{{ itemCtrl.get('supplierProductCode')?.value }}</small>
+                @if ((itemCtrl.get('quantityReceived')?.value || 0) > 0) {
+                  <span class="received-badge">
+                    {{ itemCtrl.get('quantityReceived')?.value }} recibidos
+                  </span>
+                }
+              </div>
+
+              <!-- Cantidad -->
+              <mat-form-field appearance="outline" class="number-field">
+                <mat-label>Cantidad</mat-label>
+                <input matInput type="number" formControlName="quantityOrdered"
+                  min="0.01" step="1">
+                @if (itemCtrl.get('quantityOrdered')?.hasError('min')) {
+                  <mat-error>Mínimo 0.01</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Costo sin IVA -->
+              <mat-form-field appearance="outline" class="number-field">
+                <mat-label>Costo s/ IVA</mat-label>
+                <input matInput type="number" formControlName="unitCostWithoutTaxes"
+                  min="0.01" step="0.01">
+                <span matPrefix>$&nbsp;</span>
+              </mat-form-field>
+
+              <!-- Costo con IVA -->
+              <mat-form-field appearance="outline" class="number-field">
+                <mat-label>Costo c/ IVA</mat-label>
+                <input matInput type="number" formControlName="unitCostWithTaxes"
+                  min="0.01" step="0.01">
+                <span matPrefix>$&nbsp;</span>
+                @if (itemCtrl.get('unitCostWithTaxes')?.hasError('min')) {
+                  <mat-error>Costo requerido</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Subtotal -->
+              <div class="subtotal-cell">
+                <strong>{{ itemCtrl.get('subtotalWithTaxes')?.value | currency:'MXN':'symbol':'1.2-2' }}</strong>
+                <small>{{ itemCtrl.get('subtotalWithoutTaxes')?.value | currency:'MXN':'symbol':'1.2-2' }} s/ IVA</small>
+              </div>
+
+              <!-- Botón eliminar -->
+              <button mat-icon-button color="warn" type="button"
+                (click)="removeItem($index)"
+                [disabled]="(itemCtrl.get('quantityReceived')?.value || 0) > 0"
+                matTooltip="{{ (itemCtrl.get('quantityReceived')?.value || 0) > 0 ? 'No se puede eliminar, ya hay unidades recibidas' : 'Quitar producto' }}">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+          }
+        </div>
+
+        <!-- Totales -->
+        <div class="totals-row">
+          <div class="totals-label">Total de la orden</div>
+          <div class="totals-values">
+            <div>
+              <span class="totals-hint">Sin IVA</span>
+              <span class="totals-amount">{{ totalWithoutTaxes | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+            <div>
+              <span class="totals-hint">Con IVA</span>
+              <strong class="totals-amount-main">{{ totalWithTaxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          </div>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+  </form>
+
+  <!-- Botones flotantes -->
+  <div class="form-actions">
+    <button mat-button (click)="goBack()" [disabled]="isSaving">
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()"
+      [disabled]="form.invalid || isSaving" class="submit-btn">
+      @if (isSaving) {
+        <mat-icon class="spinner">refresh</mat-icon>
+        <span>Guardando...</span>
+      } @else {
+        <mat-icon>save</mat-icon>
+        <span>Guardar cambios</span>
+      }
+    </button>
+  </div>
+
+}

@@ -52,3 +52,27 @@ html, body {
 .mat-mdc-dialog-actions {
   padding: 8px 24px 16px !important;
 }
+
+// ===== CHIPS DE STATUS ÓRDENES DE COMPRA =====
+.po-status-chip {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &.status-pendiente      { background: #fff8e1; color: #f57f17; }
+  &.status-parcial        { background: #e3f2fd; color: #1565c0; }
+  &.status-completada     { background: #e8f5e9; color: #2e7d32; }
+  &.status-cancelada      { background: #ffebee; color: #c62828; }
+}
+
