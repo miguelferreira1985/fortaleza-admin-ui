@@ -113,15 +113,34 @@ export class EmployeeComponent {
     this.notify.confirm(
       '¿Desactivar empleado?',
       `El empleado "${employee.firstName} ${employee.lastName}" será desactivado.`
-    ).then((result) => {
-      if (result.isConfirmed && employee.id) {
-        this.employeeService.deleteEmployee(employee.id).subscribe({
-          next: () => {
-            this.notify.success('¡Desactivado!', 'El empleado fue desactivado.');
+    ).then((confimed) => {
+      if (confimed && employee.id) {
+        this.employeeService.deactivateEmployee(employee.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Desactivado!', res.message || 'El empleado fue desactivado.');
             this.loadEmployees();
           },
           error: (err) => {
             this.notify.error('Error', err?.error?.message || 'No se pudo desactivar');
+          }
+        });
+      }
+    });
+  }
+
+  activateEmployee(employee: Employee): void {
+    this.notify.confirm(
+      '¿activar empleado?',
+      `El empleado "${employee.firstName} ${employee.lastName}" será activado.`
+    ).then((confimed) => {
+      if (confimed && employee.id) {
+        this.employeeService.activateEmployee(employee.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Activado!', res.message || 'El empleado fue activado.');
+            this.loadEmployees();
+          },
+          error: (err) => {
+            this.notify.error('Error', err?.error?.message || 'No se pudo activar');
           }
         });
       }

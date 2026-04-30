@@ -23,4 +23,17 @@ export class InventoryMovementService {
     return this.http.get<ApiResponse<InventoryMovement[]>>(`${this.apiUrl}${this.apiPath}/devolutions-adjustments`);
   }
 
+  getByType(movementType: string): Observable<ApiResponse<InventoryMovement[]>> {
+    return this.http.get<ApiResponse<InventoryMovement[]>>(
+      `${this.apiUrl}/inventory-movements/by-type?type=${movementType}`
+    );
+  }
+
+  getByProductAndType(productId: number, movementType: string): Observable<ApiResponse<InventoryMovement[]>> {
+    return this.http.get<ApiResponse<InventoryMovement[]>>(
+      `${this.apiUrl}/inventory-movements/by-product-and-type?productId=${productId}&type=${movementType}`
+    );
+  }
+
+
 }

@@ -62,13 +62,13 @@ export class UpdateRolesDialogComponent implements OnInit {
     this.notify.confirm(
       '¿Actualizar permisos?',
       `¿Confirmas el cambio de permisos para "${this.data.user.username}"?`
-    ).then(result => {
-      if (result.isConfirmed) {
+    ).then((confimed) => {
+      if (confimed) {
         this.isLoading = true;
         const id = this.data.user.id as number;
         this.userService.updateRoles(id, dto).subscribe({
-          next: () => {
-            this.notify.success('¡Permisos actualizados!');
+          next: (res) => {
+            this.notify.success('¡Permisos actualizados!', res.message || 'Los permisos del usuario fueron actualizados');
             this.dialogRef.close(true);
           },
           error: (err) => {

@@ -109,12 +109,12 @@ export class PresentationComponent implements OnInit, AfterViewInit {
 
   deletePresentation(presentation: Presentation): void {
     this.notify.confirm('¿Estás seguro?', `Deseas eliminar la presentación "${presentation.name}"? Esta acción no se puede deshacer.`)
-      .then((result) => {
-        if (result.isConfirmed && presentation.id) {
+      .then((confimed) => {
+        if (confimed && presentation.id) {
           let id: number = presentation.id ?? 0;
           this.presentationService.deletePresentation(id).subscribe({
-            next: () => {
-              this.notify.success('¡Eliminado!', 'La presentación fue eliminada.');
+            next: (res) => {
+              this.notify.success('¡Eliminado!', res.message || 'La presentación fue eliminada.');
               this.loadPresentations();
             },
             error: (err) => {

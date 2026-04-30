@@ -122,6 +122,15 @@
                 <mat-icon>do_not_disturb_on</mat-icon>
               </button>
             }
+
+            @if (!s.isActivate) {
+              <button mat-icon-button color="warn"
+                (click)="activateSupplier(s)"
+                matTooltip="Activar proveedor"
+                *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+                <mat-icon>task_alt</mat-icon>
+              </button>
+            }
           </td>
         </ng-container>
 

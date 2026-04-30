@@ -28,7 +28,13 @@
       <!-- Fecha estimada -->
       <mat-form-field appearance="outline" class="date-field">
         <mat-label>Fecha estimada de entrega</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="expectedDeliveryDate" placeholder="dd/mm/aaaa" readonly>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="expectedDeliveryDate"
+          placeholder="dd/mm/aaaa"
+          [min]="today"
+          readonly>
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -41,27 +47,35 @@
 
         <mat-form-field appearance="outline" class="product-select">
           <mat-label>Producto</mat-label>
-          <mat-select formControlName="productId">
+          <input
+            type="text"
+            matInput
+            [formControl]="productSearchControl"
+            [matAutocomplete]="auto"
+            placeholder="Busca por nombre o código...">
+          <mat-icon matPrefix>inventory</mat-icon>
 
-            <mat-select-trigger>
-              @if (orderForm.get('productId')?.value) {
-                <span class="selected-product">
-                  <span class="selected-name">{{ getSelectedProduct()?.name }}</span>
-                  <span class="selected-code">{{ getSelectedProduct()?.code | uppercase }}</span>
-                </span>
-              }
-            </mat-select-trigger>
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            [displayWith]="displayProduct"
+            (optionSelected)="onProductSelected($event.option.value)">
 
-            @for (p of products; track p.id) {
-              <mat-option [value]="p.id">
-                <span class="product-option">
-                  <span class="product-option-name">{{ p.name }}</span>
-                  <span class="product-option-code">{{ p.code | uppercase}}</span>
-                </span>
+            @for (product of filteredProducts$ | async; track product.id) {
+              <mat-option [value]="product">
+                <div class="autocomplete-option">
+                  <span class="option-name">{{ product.name }}</span>
+                  <span class="option-code">{{ product.code | uppercase }}</span>
+                </div>
               </mat-option>
             }
-          </mat-select>
-          <mat-icon matPrefix>inventory</mat-icon>
+
+            @if ((filteredProducts$ | async)?.length === 0) {
+              <mat-option disabled>
+                <span class="no-results">No se encontraron productos</span>
+              </mat-option>
+            }
+
+          </mat-autocomplete>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="qty-field">
@@ -90,7 +104,16 @@
           @for (item of draftItems; track item.product.id) {
             <div class="draft-row">
               <span>{{ item.product.name }}</span>
-              <span class="qty-badge">{{ item.quantity }}</span>
+              <mat-form-field appearance="outline" class="qty-edit-field">
+                <input
+                  matInput
+                  type="number"
+                  [(ngModel)]="item.quantity"
+                  [ngModelOptions]="{standalone: true}"
+                  min="0.01"
+                  step="0.01"
+                  (blur)="onQuantityBlur(item)">
+              </mat-form-field>
               <button mat-icon-button color="warn" type="button"
                 (click)="removeDraftItem(item.product.id!)" matTooltip="Quitar">
                 <mat-icon>delete</mat-icon>

@@ -34,4 +34,8 @@ export class CategoryService {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}${this.apiPath}/${id}`);
   }
 
+  countCategories(): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.apiUrl}${this.apiPath}/count`);
+  }
+
 }

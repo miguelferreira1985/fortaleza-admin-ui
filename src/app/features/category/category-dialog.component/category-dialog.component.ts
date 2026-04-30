@@ -84,13 +84,12 @@ export class CategoryDialogComponent {
   createCategory(category: Category): void {
     this.categoryService.createCategory(category).subscribe({
       next: (res) => {
-        this.notify.success('¡Creada!', res?.message || 'La categoria fue creada exitosamente');
+        this.notify.success('¡Creada!', res?.message || 'La categoría fue creada exitosamente');
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Error al crear:', err);
-        this.notify.error('Error', err.error?.message || 'No se pudo crear la categoria');
+        this.notify.error('Error', err.error?.message || 'No se pudo crear la categoría');
       }
     })
   }
@@ -98,13 +97,12 @@ export class CategoryDialogComponent {
   updateCategory(category: Category): void {
     this.categoryService.updateCategory(category.id!, category).subscribe({
       next: (res) => {
-        this.notify.success('¡Actualizada!', res?.message || 'La categoria fue actualizada exitosamente');
+        this.notify.success('¡Actualizada!', res?.message || 'La categoría fue actualizada');
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Error al actualizar:', err);
-        this.notify.error('Error', err.error?.message || 'No se pudo actualizar la categoria');
+        this.notify.error('Error', err.error?.message || 'No se pudo actualizar la categoría');
       }
     });
   }

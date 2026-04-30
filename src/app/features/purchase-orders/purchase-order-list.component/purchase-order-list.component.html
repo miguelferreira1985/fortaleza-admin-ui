@@ -19,12 +19,33 @@
 
         <mat-form-field appearance="outline" class="filter-field-lg">
           <mat-label>Proveedor</mat-label>
-          <mat-select formControlName="supplierId">
-            @for (s of suppliers; track s.id) {
-              <mat-option [value]="s.id">{{ s.name }}</mat-option>
-            }
-          </mat-select>
+          <input
+            type="text"
+            matInput
+            [formControl]="supplierSearchControl"
+            [matAutocomplete]="auto"
+            placeholder="Busca por nombre...">
           <mat-icon matPrefix>local_shipping</mat-icon>
+
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            [displayWith]="displaySupplier"
+            (optionSelected)="onSupplierSelected($event.option.value)">
+
+            @for (supplier of filteredSuppliers$ | async; track supplier.id) {
+              <mat-option [value]="supplier">
+                {{ supplier.name }}
+              </mat-option>
+            }
+
+            @if ((filteredSuppliers$ | async)?.length === 0) {
+              <mat-option disabled>
+                <span class="no-results">No se encontraron proveedores</span>
+              </mat-option>
+            }
+
+          </mat-autocomplete>
+
           @if (filterForm.get('supplierId')?.touched && filterForm.get('supplierId')?.hasError('required')) {
             <mat-error>Selecciona un proveedor</mat-error>
           }

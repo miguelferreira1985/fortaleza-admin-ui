@@ -1,5 +1,5 @@
 .dashboard {
-  max-width: 1200px;
+  max-width: 1400px;
 }
 
 // Header de página
@@ -99,39 +99,101 @@
     border-left-color: #ef4444;
     .stat-icon { background: #ef4444; }
   }
+
+  &.stat-info {
+    border-left-color: #8b5cf6;
+    .stat-icon { background: #8b5cf6; }
+  }
 }
 
-// Card de la tabla
+// 👇 NUEVO: Grid de 2 columnas
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // 50% - 50%
+  gap: 20px;
+  align-items: start;
+
+  // En pantallas chicas, volver a 1 columna
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Columna derecha con 2 cards apiladas
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// Card de la tabla (ahora más compacta)
 .table-card {
   border-radius: 12px !important;
 
   mat-card-header {
-    padding: 16px 16px 0;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     mat-card-title {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 1rem !important;
+      font-size: 0.95rem !important;
       color: #333;
+      font-weight: 600 !important;
     }
   }
 
   mat-card-content {
-    padding: 8px 0 0 !important;
+    padding: 0 !important;
   }
 }
 
-.full-width {
+// 👇 NUEVO: Contenedor de tabla con altura máxima
+.table-container {
+  max-height: 320px; // Altura fija
+  overflow-y: auto;
+}
+
+// 👇 NUEVO: Tabla compacta
+.compact-table {
   width: 100%;
+  font-size: 0.85rem;
+
+  th {
+    background: #fce4ec;
+    color: #880e4f;
+    font-weight: 600;
+    padding: 8px 12px !important;
+    font-size: 0.8rem;
+  }
+
+  td {
+    padding: 8px 12px !important;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .product-code {
+    font-size: 0.82rem;
+    color: #333;
+    font-family: 'Courier New', monospace;
+  }
+
+  .min-stock {
+    color: #666;
+    font-size: 0.85rem;
+  }
 }
 
 // Badge de stock bajo
 .stock-badge {
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
   font-weight: 600;
+  display: inline-block;
 
   &.danger {
     background: #fee2e2;
@@ -139,23 +201,124 @@
   }
 }
 
+// 👇 NUEVO: Card de accesos rápidos
+.quick-actions-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 12px 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem !important;
+      color: #333;
+      font-weight: 600 !important;
+    }
+  }
+
+  mat-card-content {
+    padding: 16px !important;
+  }
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  button {
+    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+    padding: 0 12px !important;
+    height: 40px !important;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// 👇 NUEVO: Card de info del sistema
+.info-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 12px 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem !important;
+      color: #333;
+      font-weight: 600 !important;
+    }
+  }
+
+  mat-card-content {
+    padding: 12px 16px !important;
+  }
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fafafa;
+
+  mat-icon {
+    color: #e91e63;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .info-label {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .info-value {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+  }
+}
+
 // Estado vacío de la tabla
 .no-data {
   text-align: center;
-  padding: 32px !important;
+  padding: 24px !important;
   color: #888;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-size: 0.85rem;
 
   mat-icon {
     color: #4caf50;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 
 .loading-container {
   display: flex;
   justify-content: center;
-  padding: 40px;
+  padding: 32px;
 }

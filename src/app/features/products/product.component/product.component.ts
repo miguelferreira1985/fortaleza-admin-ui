@@ -148,10 +148,13 @@ export class ProductComponent implements OnInit, AfterViewInit {
 
   activateProduct(product: Product): void {
     this.notify.confirm('¿Activar producto?', `¿Activas "${product.name}"?`)
-      .then(r => {
-        if (r.isConfirmed && product.id) {
+      .then((confimed) => {
+        if (confimed && product.id) {
           this.productService.activateProduct(product.id).subscribe({
-            next: () => { this.notify.success('¡Activado!'); this.loadProducts(); },
+            next: (res) => {
+              this.notify.success('¡Activado!', res.message || 'El Producto fue activado');
+              this.loadProducts();
+            },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }
@@ -160,10 +163,14 @@ export class ProductComponent implements OnInit, AfterViewInit {
 
   deactivateProduct(product: Product): void {
     this.notify.confirm('¿Desactivar producto?', `¿Desactivas "${product.name}"?`)
-      .then(r => {
-        if (r.isConfirmed && product.id) {
-          this.productService.desactivateProduct(product.id).subscribe({
-            next: () => { this.notify.success('¡Desactivado!'); this.loadProducts(); },
+      .then((confimed) => {
+        if (confimed && product.id) {
+          this.productService.activateProduct(product.id).subscribe({
+            next: (res) => {
+              this.notify.success('Descativado!', res.message || 'El Producto fue desactivado');
+              this.loadProducts();
+
+          },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }

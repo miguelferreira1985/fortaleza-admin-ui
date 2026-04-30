@@ -36,8 +36,12 @@ export class EmployeeService {
     return this.http.put<ApiResponse<Employee>>(`${this.apiUrl}${this.apiPath}/${id}`, employeeRequestDto);
   }
 
-  deleteEmployee(id: number): Observable<Employee> {
-    return this.http.patch<Employee>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  deactivateEmployee(id: number): Observable<ApiResponse<Employee>> {
+    return this.http.patch<ApiResponse<Employee>>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  }
+
+  activateEmployee(id: number): Observable<ApiResponse<Employee>> {
+    return this.http.patch<ApiResponse<Employee>>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
   }
 
   createUserForEmployee(id: number, userRequestDTO: UserRequestDto): Observable<ApiResponse<Employee>> {

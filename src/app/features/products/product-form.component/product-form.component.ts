@@ -196,17 +196,24 @@ export class ProductFormComponent implements OnInit {
     this.updating = false;
   }
 
-  onProfitChange(): void {
+  onProfitInput(event: Event): void {
     if (this.updating) return;
+
     this.updating = true;
+    this.profitPercentage = Number((event.target as HTMLInputElement).value) || 0;
+
     const cost = Number(this.c('cost').value) || 0;
-    const profit = Number(this.profitPercentage) || 0;
     if (cost > 0) {
-      const newPrice = profit === 0 ? cost : cost * (1 + profit / 100);
-      this.c('price').setValue(+this.round2(newPrice), { emitEvent: false });
+      const newPrice = this.profitPercentage === 0
+        ? cost
+        : this.round2(cost * (1 + this.profitPercentage / 100));
+        this.c('price').setValue(newPrice, { emitEvent: false });
     }
-    this.calculateProfitPercentage();
     this.updating = false;
+  }
+
+  onProfitBlur(): void {
+    this.profitPercentage = this.round2(Number(this.profitPercentage) || 0);
   }
 
   private applyProduct(p: Product): void {

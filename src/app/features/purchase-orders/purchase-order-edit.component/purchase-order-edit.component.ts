@@ -29,6 +29,7 @@ export class PurchaseOrderEditComponent implements OnInit {
   isLoading = false;
   isSaving = false;
   orderId!: number;
+  today = new Date();
 
   readonly IVA_RATE = 0.16;
   readonly getStatusConfig = getStatusConfig;

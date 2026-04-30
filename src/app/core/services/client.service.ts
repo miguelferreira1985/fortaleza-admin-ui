@@ -34,8 +34,16 @@ export class ClientService {
     return this.http.put<ApiResponse<Client>>(`${this.apiUrl}${this.apiPath}/${id}`, client);
   }
 
-  deleteClient(id: number): Observable<Client> {
-    return this.http.patch<Client>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  deactivateClient(id: number): Observable<ApiResponse<Client>> {
+    return this.http.patch<ApiResponse<Client>>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  }
+
+  activateClient(id: number): Observable<ApiResponse<Client>> {
+    return this.http.patch<ApiResponse<Client>>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
+  }
+
+  countActiveClients(): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.apiUrl}${this.apiPath}/count/active`);
   }
 
 }

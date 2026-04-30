@@ -71,15 +71,15 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   completeOrder(): void {
     this.notify.confirm('¿Completar orden?', `¿Marcas la orden #${this.orderId} como completada?`)
-      .then(r => {
-        if (r.isConfirmed) this.updateStatus(PurchaseOrderStatus.COMPLETADA);
+      .then((confirmed) => {
+        if (confirmed) this.updateStatus(PurchaseOrderStatus.COMPLETADA);
       });
   }
 
   cancelOrder(): void {
     this.notify.confirm('¿Cancelar orden?', `¿Cancelas la orden #${this.orderId}? Esta acción no se puede deshacer.`)
-      .then(r => {
-        if (r.isConfirmed) this.updateStatus(PurchaseOrderStatus.CANCELADA);
+      .then((confirmed) => {
+        if (confirmed) this.updateStatus(PurchaseOrderStatus.CANCELADA);
       });
   }
 
@@ -95,7 +95,27 @@ export class PurchaseOrderDetailComponent implements OnInit {
     });
   }
 
-  printPdf(): void { window.print(); }
-  goBack(): void   { this.location.back(); }
+  printPdf(): void {
+      // Oculta el sidebar antes de imprimir
+  const sidebar = document.querySelector('mat-sidenav');
+  const header = document.querySelector('.form-page-header');
+  const infoCard = document.querySelector('.info-card');
+
+  if (sidebar) (sidebar as HTMLElement).style.display = 'none';
+  if (header) (header as HTMLElement).style.display = 'none';
+  if (infoCard) (infoCard as HTMLElement).style.display = 'none';
+
+  // Imprime
+  window.print();
+
+  // Restaura después de imprimir
+  setTimeout(() => {
+    if (sidebar) (sidebar as HTMLElement).style.display = '';
+    if (header) (header as HTMLElement).style.display = '';
+    if (infoCard) (infoCard as HTMLElement).style.display = '';
+  }, 1000);
+  }
+
+  goBack(): void   { this.router.navigate(['/purchase-orders'])}
 
 }

@@ -41,6 +41,44 @@
   .add-item-btn { height: 56px; border-radius: 8px !important; white-space: nowrap; }
 }
 
+// 👇 NUEVO: Estilos mejorados para opciones del autocomplete
+.autocomplete-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.option-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.option-code {
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: #880e4f;
+  background: #fce4ec;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.no-results {
+  color: #999;
+  font-style: italic;
+  font-size: 14px;
+}
+
+::ng-deep .mat-mdc-autocomplete-panel {
+  max-height: 400px !important;
+}
+
 // Tabla de borrador
 .draft-table {
   border: 1px solid #fce4ec;
@@ -50,23 +88,102 @@
 }
 
 .draft-header, .draft-footer {
-  display: grid; grid-template-columns: 1fr auto 40px;
-  padding: 8px 16px; font-size: 0.82rem; font-weight: 600;
-  background: #fce4ec; color: #880e4f; align-items: center; gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr 180px 48px; // 👈 Más espacio para el input
+  padding: 12px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #fce4ec;
+  color: #880e4f;
+  align-items: center;
+  gap: 12px;
 }
 
 .draft-row {
-  display: grid; grid-template-columns: 1fr auto 40px;
-  padding: 8px 16px; align-items: center; gap: 12px;
-  border-bottom: 1px solid #fce4ec; font-size: 0.9rem;
+  display: grid;
+  grid-template-columns: 1fr 180px 48px; // 👈 Más espacio para el input
+  padding: 8px 16px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid #fce4ec;
+  font-size: 0.9rem;
   transition: background 0.15s;
-  &:hover { background: #fff5f8; }
-  &:last-child { border-bottom: none; }
+
+  &:hover {
+    background: #fff5f8;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .product-name {
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+// 👇 MEJORADO: Input de cantidad en la tabla
+.qty-edit-field {
+  margin: 0 !important; // Sin margen extra
+
+  ::ng-deep {
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none; // Sin espacio para hints/errores
+    }
+
+    .mat-mdc-text-field-wrapper {
+      padding: 0;
+      background: #fff;
+      border: 2px solid #fce4ec;
+      border-radius: 8px;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: #f8bbd0;
+      }
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      display: none; // Sin overlay de focus
+    }
+
+    .mdc-text-field--outlined .mdc-notched-outline {
+      display: none; // Sin el outline de Material
+    }
+
+    .mat-mdc-form-field-infix {
+      padding: 10px 12px;
+      min-height: auto;
+    }
+  }
+
+  input {
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #880e4f;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  // Cuando está focused
+  &:focus-within ::ng-deep .mat-mdc-text-field-wrapper {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+  }
 }
 
 .qty-badge {
-  background: #fce4ec; color: #880e4f;
-  padding: 2px 10px; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+  background: #fce4ec;
+  color: #880e4f;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
 }
 
 .create-order-actions {
@@ -105,42 +222,3 @@
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .spinner { animation: spin 1s linear infinite; }
-
-.product-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 8px;
-
-  .product-option-name { flex: 1; font-weight: 500; }
-  .product-option-code {
-    font-size: 0.78rem;
-    font-family: 'Courier New', monospace;
-    color: #888;
-    background: #f5f5f5;
-    padding: 1px 6px;
-    border-radius: 6px;
-  }
-}
-
-.selected-product {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  .selected-name {
-    font-weight: 500;
-    color: #333;
-  }
-
-  .selected-code {
-    font-size: 0.78rem;
-    font-family: 'Courier New', monospace;
-    background: #fce4ec;
-    color: #880e4f;
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-weight: 600;
-  }
-}

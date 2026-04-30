@@ -107,16 +107,136 @@
   p { margin: 8px 0 0; font-size: 0.88rem; }
 }
 
-// Print styles
+// Print styles - Solo tabla de productos
 @media print {
-  .no-print { display: none !important; }
-  .info-card, .items-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+  // Oculta el sidebar de Angular Material
+  mat-sidenav,
+  mat-drawer,
+  .mat-drawer,
+  .mat-sidenav {
+    display: none !important;
+  }
+
+  // Oculta headers, toolbars, navegación
+  mat-toolbar,
+  .mat-toolbar,
+  header,
+  nav,
+  .sidebar,
+  .sidenav,
+  .form-page-header,
+  .no-print {
+    display: none !important;
+  }
+
+  // Oculta la info card (información general)
+  .info-card {
+    display: none !important;
+  }
+
+  // El contenedor principal debe ocupar todo el ancho
+  mat-sidenav-content,
+  .mat-drawer-content,
+  .mat-sidenav-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  // Resetea el body y html
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  // La tabla de productos debe ser lo único visible
+  .items-card {
+    margin: 20px !important;
+    width: calc(100% - 40px) !important;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    page-break-inside: avoid;
+  }
+
+  // Header de la card
+  .items-card mat-card-header {
+    padding: 12px 16px !important;
+    background: #fce4ec !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+
+    mat-card-title {
+      font-size: 14pt !important;
+      color: #880e4f !important;
+    }
+  }
+
+  // Tabla optimizada para impresión
+  .items-table {
+    width: 100% !important;
+    font-size: 9pt !important;
+
+    th {
+      background: #f5f5f5 !important;
+      color: #000 !important;
+      font-weight: 600 !important;
+      padding: 6px 4px !important;
+      border: 1px solid #ccc !important;
+      font-size: 8pt !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    td {
+      padding: 5px 4px !important;
+      border: 1px solid #ddd !important;
+      color: #000 !important;
+      font-size: 9pt !important;
+    }
+
+    // Quita efectos hover
+    .table-row:hover {
+      background: transparent !important;
+    }
+
+    // Asegura que los textos sean negros
+    strong {
+      color: #000 !important;
+    }
+  }
+
+  // Badges de pendientes
+  .pending-badge {
+    border: 1px solid #999 !important;
+    padding: 2px 6px !important;
+    font-size: 8pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+
+    &.zero {
+      background: #e8f5e9 !important;
+      color: #000 !important;
+    }
+  }
+
+  // Números completados en verde
+  .received-complete {
+    color: #000 !important;
+    font-weight: 600 !important;
+  }
+
+  // Oculta scroll si aparece
+  .table-scroll {
+    overflow: visible !important;
+  }
+
+  // Footer/copyright si existe
+  footer,
+  .footer,
+  .mat-toolbar-row {
+    display: none !important;
+  }
 }
 
-.cost-update-notice {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 14px; border-radius: 8px;
-  background: #e3f2fd; color: #1565c0;
-  font-size: 0.85rem; margin-bottom: 16px;
-  mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
-}

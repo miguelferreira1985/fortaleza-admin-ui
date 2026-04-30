@@ -109,15 +109,34 @@ export class ClientComponent {
     this.notify.confirm(
       '¿Desactivar cliente?',
       `El cliente "${client.name}" será desactivado pero no eliminado.`
-    ).then((result) => {
-      if (result.isConfirmed && client.id) {
-        this.clientService.deleteClient(client.id).subscribe({
-          next: () => {
-            this.notify.success('¡Desactivado!', 'El cliente fue desactivado.');
+    ).then((confimed) => {
+      if (confimed && client.id) {
+        this.clientService.deactivateClient(client.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Desactivado!', res.message || 'El cliente fue desactivado.');
             this.loadClients();
           },
           error: (err) => {
             this.notify.error('Error', err?.error?.message || 'No se pudo desactivar');
+          }
+        });
+      }
+    });
+  }
+
+  activateClient(client: Client): void {
+    this.notify.confirm(
+      '¿Activar cliente?',
+      `El cliente "${client.name}" será activado.`
+    ).then((confimed) => {
+      if (confimed && client.id) {
+        this.clientService.activateClient(client.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Activado!', res.message || 'El cliente fue activado.');
+            this.loadClients();
+          },
+          error: (err) => {
+            this.notify.error('Error', err?.error?.message || 'No se pudo activar');
           }
         });
       }

@@ -9,6 +9,7 @@ import { InventoryMovement } from '../../shared/models/inventory-movement';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Product } from '../../shared/models/product';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-inventory-movement.component',
@@ -31,35 +32,42 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  // Autocomplete de producto
-  productControl = new FormControl<Product | string | null>(null);
-  allProducts: Product[] = [];
+  productControl = new FormControl('');
+  movementTypeControl = new FormControl('');
+  products: Product[] = [];
   filteredProducts: Product[] = [];
   selectedProductId: number | null = null;
 
   searchTerm = '';
   isLoading = false;
-  totalItems = 0;
+
+  movementTypeOptions = [
+    { value: 'ALL', label: 'Todos los tipos' },
+    { value: 'COMPRA', label: 'Compra' },
+    { value: 'VENTA', label: 'Venta' },
+    { value: 'AJUSTE', label: 'Ajuste' },
+    { value: 'DEVOLUCION', label: 'Devolución' }
+  ];
 
   displayedColumns: string[] = [
-    'productCode', 'previousStock', 'quantity',
-    'newStock', 'movementType', 'description', 'createdBy', 'movementDate'
+    'productCode',
+    'previousStock',
+    'quantity',
+    'newStock',
+    'movementType',
+    'description',
+    'createdBy',
+    'movementDate'
   ];
 
   ngOnInit(): void {
     this.loadProducts();
-    this.loadInitialMovements();
+    this.setupProductAutocomplete();
+    this.loadMovements();
 
-    // Escuchar cambios en el autocomplete
-    this.productControl.valueChanges.subscribe(val => {
-      if (typeof val === 'string') {
-        this.filteredProducts = this.filterProducts(val);
-      } else if (val && typeof val === 'object') {
-        this.filteredProducts = this.allProducts;
-      } else {
-        this.filteredProducts = this.allProducts;
-      }
-    });
+    this.movementTypeControl.valueChanges.subscribe(() => {
+      this.loadMovements()
+    })
   }
 
   ngAfterViewInit(): void {
@@ -67,46 +75,47 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
     this.dataSource.sort = this.sort;
   }
 
+  getTotalItems(): number {
+    return this.dataSource.filteredData.length;
+  }
+
+  get selectedMovementTypeLabel(): string {
+    const selected = this.movementTypeOptions.find(
+      o => o.value === this.movementTypeControl.value
+    );
+    return selected?.label || 'Todos los tipos';
+  }
+
   loadProducts(): void {
     this.productService.getProducts(true).subscribe({
       next: (data) => {
-        this.allProducts = data;
-        this.filteredProducts = data;
+        this.products = data;
+        this.filteredProducts = this.products;
       },
       error: (err) => console.error(err)
     });
   }
 
-  loadInitialMovements(): void {
-    this.isLoading = true;
-    this.inventoryMovementService.getDevolutionsAndAdujustments().subscribe({
-      next: (res) => {
-        this.setMovements(res.data);
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-      }
+  setupProductAutocomplete(): void {
+    this.productControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe((value) => {
+      const searchText = typeof value === 'string' ? value : '';
+      this.filterProducts(searchText);
     });
   }
 
   onProductSelected(product: Product): void {
     this.selectedProductId = product.id ?? null;
-    this.isLoading = true;
-
-    this.inventoryMovementService.getByProduct(product.id!).subscribe({
-      next: (res) => this.setMovements(res.data),
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-      }
-    });
+    this.loadMovements();
   }
 
   clearProductFilter(): void {
     this.productControl.setValue(null);
     this.selectedProductId = null;
-    this.loadInitialMovements();
+    this.loadMovements();
   }
 
   applyFilter(): void {
@@ -118,7 +127,59 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
     return product ? product.name : '';
   }
 
-  // Colores para el chip del tipo de movimiento
+  loadMovements(): void {
+    this.isLoading = true;
+
+    const productId = this.selectedProductId;
+    const movementType = this.movementTypeControl.value;
+
+    if (productId && movementType && movementType !== 'ALL'){
+      this.inventoryMovementService.getByProductAndType(productId, movementType).subscribe({
+        next: (res) => {
+          this.dataSource.data = res.data ?? res;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.isLoading = false;
+        }
+      });
+    } else if (productId) {
+      this.inventoryMovementService.getByProduct(productId).subscribe({
+        next: (res) => {
+          this.dataSource.data = res.data ?? res;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.isLoading = false;
+        }
+      });
+    } else if (movementType && movementType !== 'ALL') {
+      this.inventoryMovementService.getByType(movementType).subscribe({
+        next: (res) => {
+          this.dataSource.data = res.data ?? res;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.inventoryMovementService.getDevolutionsAndAdujustments().subscribe({
+        next: (res) => {
+          this.dataSource.data = res.data ?? res;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error:', err);
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
   getMovementTypeColor(type: string): string {
     const colors: Record<string, string> = {
       'COMPRA':    'chip-compra',
@@ -139,26 +200,15 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
     return icons[type?.toUpperCase()] || 'swap_horiz';
   }
 
-  private setMovements(data: InventoryMovement[]): void {
-    this.dataSource.data = data;
-    this.totalItems = data.length;
-    this.dataSource.filterPredicate = (item: InventoryMovement, filter: string) => {
-      const search = filter.toLowerCase();
-      return (
-        (item.productCode?.toLowerCase().includes(search) ?? false) ||
-        (item.movementType?.toLowerCase().includes(search) ?? false) ||
-        (item.createdBy?.toLowerCase().includes(search) ?? false) ||
-        (item.description?.toLowerCase().includes(search) ?? false)
-      );
-    };
-    this.isLoading = false;
-  }
+  private filterProducts(searchText: string): void {
+    if (!searchText) {
+      this.filteredProducts = this.products;
+      return;
+    }
 
-  private filterProducts(value: string): Product[] {
-    const search = value.toLowerCase();
-    return this.allProducts.filter(p =>
-      p.name.toLowerCase().includes(search) ||
-      p.code.toLowerCase().includes(search)
+    const filterValue = searchText.toLowerCase().trim();
+    this.filteredProducts = this.products.filter(p =>
+      p.name.toLowerCase().includes(filterValue) || p.code.toLowerCase().includes(filterValue)
     );
   }
 

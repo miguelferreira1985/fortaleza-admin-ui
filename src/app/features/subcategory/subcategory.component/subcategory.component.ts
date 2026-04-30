@@ -101,11 +101,11 @@ export class SubcategoryComponent {
     this.notify.confirm(
       '¿Estás seguro?',
       `¿Deseas eliminar la subcategoría "${subcategory.name}"? Esta acción no se puede deshacer.`
-    ).then((result) => {
-      if (result.isConfirmed && subcategory.id) {
+    ).then((confirmed) => {
+      if (confirmed && subcategory.id) {
         this.subcategoryService.deleteSubcategory(subcategory.id).subscribe({
-          next: () => {
-            this.notify.success('¡Eliminada!', 'La subcategoría fue eliminada.');
+          next: (res) => {
+            this.notify.success('¡Eliminada!', res.message || 'La subcategoría fue eliminada.');
             this.loadSubcategories();
           },
           error: (err) => {

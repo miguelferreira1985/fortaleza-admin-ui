@@ -29,9 +29,44 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
 
-  .product-filter-field {
-    width: 100%;
-    max-width: 500px;
+  .filters-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .filter-field {
+    flex: 1;
+    min-width: 280px;
+
+    &.filter-field-sm {
+      flex: 0 0 240px;
+      min-width: 240px;
+    }
+  }
+
+  .filter-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fff5f8;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #880e4f;
+
+    mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #e91e63;
+    }
+
+    strong {
+      font-weight: 600;
+    }
   }
 }
 
@@ -47,6 +82,11 @@
     font-size: 0.78rem;
     color: #888;
     font-family: 'Courier New', monospace;
+  }
+
+  .product-filter-field {
+    width: 100%;
+    max-width: 500px;
   }
 }
 

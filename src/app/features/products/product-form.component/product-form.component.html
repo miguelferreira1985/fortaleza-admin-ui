@@ -9,17 +9,6 @@
       <span class="header-subtitle">{{ isEditMode ? 'Modifica los datos del producto' : 'Completa los datos del nuevo producto' }}</span>
     </div>
   </div>
-
-  <button mat-raised-button color="primary" (click)="onSubmit()"
-    [disabled]="form.invalid || isSaving" class="save-btn-header">
-    @if (isSaving) {
-      <mat-icon class="spinner">refresh</mat-icon>
-      <span>Guardando...</span>
-    } @else {
-      <mat-icon>save</mat-icon>
-      <span>{{ isEditMode ? 'Guardar cambios' : 'Crear producto' }}</span>
-    }
-  </button>
 </div>
 
 @if (isLoading) {
@@ -135,8 +124,13 @@
         <!-- Ganancia % -->
         <mat-form-field appearance="outline">
           <mat-label>Ganancia (%)</mat-label>
-          <input matInput type="number" [value]="profitPercentage" min="0"
-            (input)="profitPercentage = $any($event.target).value; onProfitChange()">
+          <input matInput
+            type="number"
+            [value]="profitPercentage"
+            min="0"
+            step="0.01"
+            (input)="onProfitInput($event)"
+            (blur)="onProfitBlur()">
           <mat-icon matPrefix>trending_up</mat-icon>
           @if (c('cost').value && profitPercentage > 0) {
             <mat-hint>+{{ (c('price').value - c('cost').value) | currency:'MXN':'symbol':'1.2-2' }}</mat-hint>

@@ -20,28 +20,29 @@ export class UserService {
 
   getUsers(): Observable<User[]> {
     return this.http
-      .get<ApiResponse<User[]>>(`${this.apiUrl}${this.apiPath}`).pipe(map(res => res.data));
+      .get<ApiResponse<User[]>>(`${this.apiUrl}${this.apiPath}`)
+      .pipe(map(res => res.data));
   }
 
-  activateUser(id: number): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
+  activateUser(id: number): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
   }
 
-  desactivateUser(id: number): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  desactivateUser(id: number): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
   }
 
-  unblockUser(id: number): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}${this.apiPath}/${id}/unblock`, null);
+  unblockUser(id: number): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.apiUrl}${this.apiPath}/${id}/unblock`, null);
   }
 
-  changePassword(id: number, changePasswordRequestDto: ChangePasswordRequestDto): Observable<User> {
+  changePassword(id: number, changePasswordRequestDto: ChangePasswordRequestDto): Observable<ApiResponse<User>> {
     console.log('request de servicio', changePasswordRequestDto);
-    return this.http.patch<User>(`${this.apiUrl}${this.apiPath}/${id}/password`, changePasswordRequestDto);
+    return this.http.patch<ApiResponse<User>>(`${this.apiUrl}${this.apiPath}/${id}/password`, changePasswordRequestDto);
   }
 
-  updateRoles(id: number, updateRolesRequestDto: UpdateRolesRequestDto): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}${this.apiPath}/${id}/roles`, updateRolesRequestDto);
+  updateRoles(id: number, updateRolesRequestDto: UpdateRolesRequestDto): Observable<ApiResponse<User>> {
+    return this.http.patch<ApiResponse<User>>(`${this.apiUrl}${this.apiPath}/${id}/roles`, updateRolesRequestDto);
   }
 
   deleteUser(id: number): Observable<ApiResponse<void>> {

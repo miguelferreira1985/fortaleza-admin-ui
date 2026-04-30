@@ -62,9 +62,8 @@ export class CategoryComponent {
 
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error al cargar categorias:', error);
-        this.notify.error('Error', 'No se pudieron cargar las categorias');
+      error: (err) => {
+        this.notify.error('Error', err.message.errors || 'No se pudieron cargar las categorias, intenta mas tarde');
         this.isLoading = false;
       }
     });
@@ -108,17 +107,16 @@ export class CategoryComponent {
   }
 
   deleteCategory(category: Category): void {
-    this.notify.confirm('¿Estás seguro?', `Deseas eliminar la categoria "${category.name}"? Esta acción no se puede deshacer.`)
-      .then((result) => {
-        if (result.isConfirmed && category.id) {
+    this.notify.confirm('¿Estás seguro?', `¿Deseas eliminar la categoría "${category.name}"? Esta acción no se puede deshacer.`)
+      .then((confimed) => {
+        if (confimed && category.id) {
           let id: number = category.id ?? 0;
           this.categoryService.deleteCategory(id).subscribe({
-            next: () => {
-              this.notify.success('¡Eliminado!', 'La categorias fue eliminada.');
+            next: (res) => {
+              this.notify.success('¡Eliminado!', res.message || 'La categoría fue eliminada');
               this.loadCategories();
             },
             error: (err) => {
-              console.error('Error al eliminar:', err);
               this.notify.error('Error', err?.error?.message || 'No se pudo eliminar');
             }
           });

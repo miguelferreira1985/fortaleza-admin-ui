@@ -74,15 +74,13 @@ export class ChangePasswordDialogComponent implements OnInit {
       newPassword: this.form.get('newPassword')?.value
     }
 
-    this.notify.confirm(
-      '¿Cambiar contraseña?',
-      `¿Confirmas el cambio de contraseña para "${this.displayName}"?`
-    ).then(result => {
-      if (result.isConfirmed) {
+    this.notify.confirm('¿Cambiar contraseña?', `¿Confirmas el cambio de contraseña para "${this.displayName}"?`)
+    .then((confirmed) => {
+      if (confirmed) {
         this.isLoading = true;
         this.userService.changePassword(this.userId, dto).subscribe({
-          next: () => {
-            this.notify.success('¡Contraseña actualizada!');
+          next: (res) => {
+            this.notify.success('¡Actualizacion exitosa!', res.message);
             this.dialogRef.close(true);
           },
           error: (err) => {

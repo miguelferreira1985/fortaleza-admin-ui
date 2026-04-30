@@ -115,15 +115,34 @@ export class SupplierComponent implements OnInit, AfterViewInit {
     this.notify.confirm(
       '¿Desactivar proveedor?',
       `El proveedor "${supplier.name}" será desactivado y sus productos asociados serán desvinculados.`
-    ).then((result) => {
-      if (result.isConfirmed && supplier.id) {
-        this.supplierService.deleteSupplier(supplier.id).subscribe({
-          next: () => {
-            this.notify.success('¡Desactivado!', 'El proveedor fue desactivado.');
+    ).then((confirmed) => {
+      if (confirmed && supplier.id) {
+        this.supplierService.deactivateSupplier(supplier.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Desactivado!', res.message || 'El proveedor fue desactivado.');
             this.loadSuppliers();
           },
           error: (err) => {
             this.notify.error('Error', err?.error?.message || 'No se pudo desactivar');
+          }
+        });
+      }
+    });
+  }
+
+  activateSupplier(supplier: Supplier): void {
+    this.notify.confirm(
+      '¿Activar proveedor?',
+      `El proveedor "${supplier.name}" será activado.`
+    ).then((confirmed) => {
+      if (confirmed && supplier.id) {
+        this.supplierService.activateSupplier(supplier.id).subscribe({
+          next: (res) => {
+            this.notify.success('¡Activado!', res.message || 'El proveedor fue activado.');
+            this.loadSuppliers();
+          },
+          error: (err) => {
+            this.notify.error('Error', err?.error?.message || 'No se pudo activar');
           }
         });
       }

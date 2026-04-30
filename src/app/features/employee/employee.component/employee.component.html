@@ -108,6 +108,12 @@
                 <mat-icon>person_off</mat-icon>
               </button>
             }
+
+            @if (!e.isActivate) {
+              <button mat-icon-button color="warn" (click)="activateEmployee(e)" matTooltip="Activar">
+                <mat-icon>how_to_reg</mat-icon>
+              </button>
+            }
           </td>
         </ng-container>
 

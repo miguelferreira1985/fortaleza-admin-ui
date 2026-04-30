@@ -35,8 +35,12 @@ export class SupplierService {
     return this.http.put<ApiResponse<Supplier>>(`${this.apiUrl}${this.apiPath}/${id}`, supplier);
   }
 
-  deleteSupplier(id: number): Observable<ApiResponse<Supplier>> {
+  deactivateSupplier(id: number): Observable<ApiResponse<Supplier>> {
     return this.http.patch<ApiResponse<Supplier>>(`${this.apiUrl}${this.apiPath}/${id}/deactivate`, null);
+  }
+
+  activateSupplier(id: number): Observable<ApiResponse<Supplier>> {
+    return this.http.patch<ApiResponse<Supplier>>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
   }
 
   getProductsBySupplier(id: number, isActivate?: boolean): Observable<ApiResponse<Product[]>> {
@@ -50,6 +54,10 @@ export class SupplierService {
 
     getSupplierById(id: number): Observable<ApiResponse<Supplier>> {
     return this.http.get<ApiResponse<Supplier>>(`${this.apiUrl}${this.apiPath}/${id}`);
+  }
+
+  countActiveSuppliers(): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.apiUrl}${this.apiPath}/count/active`);
   }
 
 }

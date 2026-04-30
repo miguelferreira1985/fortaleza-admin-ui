@@ -30,18 +30,22 @@ export class MainLayoutComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   currentUser: CurrentUser | null = null;
-  expandedSection: string | null = 'inventory';
+  expandedSection = new Set<string>(['inventario', 'compras', 'crm']);
 
   ngOnInit(): void {
     this,this.currentUser = this.autService.getCurrentUser();
   }
 
   toggleSection(section: string): void {
-    this.expandedSection = this.expandedSection === section ? null : section;
+    if (this.expandedSection.has(section)) {
+      this.expandedSection.delete(section);
+    } else {
+      this.expandedSection.add(section);
+    }
   }
 
   isSectionExpanded(section: string): boolean {
-    return this.expandedSection === section;
+    return this.expandedSection.has(section);
   }
 
   openChangePasswordDialog(): void {

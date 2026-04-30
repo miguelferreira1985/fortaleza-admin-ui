@@ -7,47 +7,74 @@
   <p class="page-subtitle">Devoluciones y ajustes de stock</p>
 </div>
 
-<!-- ===== FILTRO POR PRODUCTO ===== -->
+<!-- ===== FILTROS ===== -->
 <div class="filter-card">
-  <mat-form-field appearance="outline" class="product-filter-field">
-    <mat-label>Filtrar por producto</mat-label>
-    <input
-      matInput
-      [formControl]="productControl"
-      [matAutocomplete]="autoProd"
-      placeholder="Escribe para buscar...">
-    <mat-icon matPrefix>inventory</mat-icon>
+  <div class="filters-row">
 
-    @if (productControl.value) {
-      <button mat-icon-button matSuffix type="button" (click)="clearProductFilter()">
-        <mat-icon>close</mat-icon>
-      </button>
+    <!-- Filtro por producto -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Filtrar por producto</mat-label>
+      <input
+        matInput
+        [formControl]="productControl"
+        [matAutocomplete]="autoProd"
+        placeholder="Escribe para buscar...">
+      <mat-icon matPrefix>inventory</mat-icon>
+
+      @if (productControl.value) {
+        <button mat-icon-button matSuffix type="button" (click)="clearProductFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+
+      <mat-autocomplete #autoProd="matAutocomplete"
+        [displayWith]="displayProduct"
+        (optionSelected)="onProductSelected($event.option.value)">
+        @for (product of filteredProducts; track product.id) {
+          <mat-option [value]="product">
+            <div class="product-option">
+              <span class="product-option-name">{{ product.name }} </span>
+              <span class="product-option-code">{{ product.code | uppercase }}</span>
+            </div>
+          </mat-option>
+        }
+        @if (filteredProducts.length === 0) {
+          <mat-option disabled>Sin resultados</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- 👇 NUEVO: Filtro por tipo de movimiento -->
+    <mat-form-field appearance="outline" class="filter-field filter-field-sm">
+      <mat-label>Tipo de movimiento</mat-label>
+      <mat-select [formControl]="movementTypeControl">
+        @for (option of movementTypeOptions; track option.value) {
+          <mat-option [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matPrefix>category</mat-icon>
+    </mat-form-field>
+
+  </div>
+
+  <!-- Hint dinámico -->
+  <div class="filter-hint">
+    @if (selectedProductId && movementTypeControl.value !== 'ALL') {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando movimientos tipo <strong>{{ selectedMovementTypeLabel }}</strong> del producto seleccionado</span>
+    } @else if (selectedProductId) {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando todos los movimientos del producto seleccionado</span>
+    } @else if (movementTypeControl.value !== 'ALL') {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando movimientos tipo <strong>{{ selectedMovementTypeLabel }}</strong> de todos los productos</span>
+    } @else {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando devoluciones y ajustes de todos los productos</span>
     }
-
-    <mat-autocomplete #autoProd="matAutocomplete"
-      [displayWith]="displayProduct"
-      (optionSelected)="onProductSelected($event.option.value)">
-      @for (product of filteredProducts; track product.id) {
-        <mat-option [value]="product">
-          <div class="product-option">
-            <span class="product-option-name">{{ product.name }} </span>
-            <span class="product-option-code">{{ product.code | uppercase }}</span>
-          </div>
-        </mat-option>
-      }
-      @if (filteredProducts.length === 0) {
-        <mat-option disabled>Sin resultados</mat-option>
-      }
-    </mat-autocomplete>
-
-    <mat-hint>
-      @if (selectedProductId) {
-        Mostrando movimientos del producto seleccionado
-      } @else {
-        Mostrando devoluciones y ajustes de todos los productos
-      }
-    </mat-hint>
-  </mat-form-field>
+  </div>
 </div>
 
 <!-- ===== TABLA ===== -->
@@ -57,7 +84,7 @@
     <div class="toolbar-left">
       <h2>Movimientos</h2>
       <span class="total-badge">
-        {{ totalItems }} {{ totalItems === 1 ? 'registro' : 'registros' }}
+        {{ getTotalItems() }} {{ getTotalItems() === 1 ? 'registro' : 'registros' }}
       </span>
     </div>
     <div class="toolbar-right">
@@ -81,7 +108,9 @@
     <div class="table-scroll">
       <table mat-table [dataSource]="dataSource" matSort class="movements-table">
 
-        <!-- Producto -->
+        <!-- ... todas tus columnas existentes ... -->
+        <!-- (mantén todo el código de la tabla igual) -->
+
         <ng-container matColumnDef="productCode">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Producto</th>
           <td mat-cell *matCellDef="let m">
@@ -89,7 +118,6 @@
           </td>
         </ng-container>
 
-        <!-- Stock Previo -->
         <ng-container matColumnDef="previousStock">
           <th mat-header-cell *matHeaderCellDef>Stock Previo</th>
           <td mat-cell *matCellDef="let m">
@@ -97,7 +125,6 @@
           </td>
         </ng-container>
 
-        <!-- Cantidad -->
         <ng-container matColumnDef="quantity">
           <th mat-header-cell *matHeaderCellDef>Cantidad</th>
           <td mat-cell *matCellDef="let m">
@@ -109,7 +136,6 @@
           </td>
         </ng-container>
 
-        <!-- Stock Nuevo -->
         <ng-container matColumnDef="newStock">
           <th mat-header-cell *matHeaderCellDef>Stock Nuevo</th>
           <td mat-cell *matCellDef="let m">
@@ -117,7 +143,6 @@
           </td>
         </ng-container>
 
-        <!-- Tipo de movimiento -->
         <ng-container matColumnDef="movementType">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
           <td mat-cell *matCellDef="let m">
@@ -128,7 +153,6 @@
           </td>
         </ng-container>
 
-        <!-- Descripción -->
         <ng-container matColumnDef="description">
           <th mat-header-cell *matHeaderCellDef>Justificación</th>
           <td mat-cell *matCellDef="let m">
@@ -136,7 +160,6 @@
           </td>
         </ng-container>
 
-        <!-- Hecho por -->
         <ng-container matColumnDef="createdBy">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Hecho por</th>
           <td mat-cell *matCellDef="let m">
@@ -147,7 +170,6 @@
           </td>
         </ng-container>
 
-        <!-- Fecha -->
         <ng-container matColumnDef="movementDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
           <td mat-cell *matCellDef="let m">

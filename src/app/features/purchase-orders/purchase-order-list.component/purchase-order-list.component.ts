@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from '../../../shared/material-module';
 import { SupplierService } from '../../../core/services/supplier.service';
 import { PurchaseOrderService } from '../../../core/services/purchase-order.service';
@@ -13,12 +13,14 @@ import { MatSort } from '@angular/material/sort';
 import { Supplier } from '../../../shared/models/supplier';
 import { PurchaseOrderStatus } from '../../../shared/models/purchase-order-status.enum';
 import { getStatusConfig } from '../../../core/utils/purchase-order-status.util';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-purchase-order-list.component',
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MaterialModule
   ],
   templateUrl: './purchase-order-list.component.html',
@@ -41,6 +43,9 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
   suppliers: Supplier[] = [];
   isLoading = false;
   hasSearched = false;
+
+  supplierSearchControl = new FormControl('');
+  filteredSuppliers$!: Observable<Supplier[]>;
 
   readonly statusEnum = PurchaseOrderStatus;
   readonly getStatusConfig = getStatusConfig;
@@ -79,9 +84,22 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
 
   loadSuppliers(): void {
     this.supplierService.getSuppliers(true).subscribe({
-      next: data => this.suppliers = data,
+      next: data => {
+        this.suppliers = data;
+        this.setupAutocomplete();
+      },
       error: err => console.error(err)
     });
+  }
+
+  setupAutocomplete(): void {
+    this.filteredSuppliers$ = this.supplierSearchControl.valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        const searchText = typeof value === 'string' ? value : '';
+        return this.filterSuppliers(searchText);
+      })
+    );
   }
 
   get canSearch(): boolean {
@@ -102,8 +120,7 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
     this.purchaseOrderService.getBySupplier(supplierId).subscribe({
       next: res => {
         const orders: PurchaseOrder[] = res.data ?? res;
-        this.dataSource.data = (statusVal === 'ALL' ? orders : orders.filter(o => o.status === statusVal))
-  .sort((a, b) => this.sortByStatus(a, b));
+        this.dataSource.data = (statusVal === 'ALL' ? orders : orders.filter(o => o.status === statusVal)).sort((a, b) => this.sortByStatus(a, b));
         this.isLoading = false;
       },
       error: err => {
@@ -120,8 +137,8 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
 
   markAsCompleted(order: PurchaseOrder): void {
     this.notify.confirm('¿Completar orden?', `¿Marcas la orden #${order.id} como COMPLETADA?`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confirmed) => {
+        if (confirmed) {
           this.updateStatus(order, PurchaseOrderStatus.COMPLETADA);
         }
       });
@@ -129,11 +146,28 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
 
   cancelOrder(order: PurchaseOrder): void {
     this.notify.confirm('¿Cancelar orden?', `¿Cancelas la orden #${order.id}? Esta acción no se puede deshacer.`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confirmed) => {
+        if (confirmed) {
           this.updateStatus(order, PurchaseOrderStatus.CANCELADA);
         }
       });
+  }
+
+  displaySupplier(supplier: Supplier | null): string {
+    return supplier ? supplier.name : '';
+  }
+
+  onSupplierSelected(supplier: Supplier): void {
+    this.filterForm.patchValue({ supplierId: supplier.id });
+  }
+
+  private filterSuppliers(searchText: string): Supplier[] {
+    if (!searchText){
+      return this.suppliers;
+    }
+
+    const filterValue = searchText.toLowerCase().trim();
+    return this.suppliers.filter(supplier => supplier.name.toLowerCase().includes(filterValue));
   }
 
   private updateStatus(order: PurchaseOrder, newStatus: PurchaseOrderStatus): void {
@@ -148,7 +182,7 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
           data[idx] = updated;
           this.dataSource.data = data;
         }
-        this.notify.success('¡Actualizado!');
+        this.notify.success('¡Actualizado!', res.message || 'La orden de compra fue actualizada');
         this.isLoading = false;
       },
       error: err => {

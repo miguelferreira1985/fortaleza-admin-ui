@@ -49,7 +49,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Login failed', err);
+        this.notify.error('Error de autenticación', err.message.errors);
       }
     })
 

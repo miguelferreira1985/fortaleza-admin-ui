@@ -7,7 +7,6 @@ import { map } from 'rxjs/operators';
 import { ProductRequestDto } from '../../shared/models/product-request-dto';
 import { ApiResponse } from '../../shared/models/api-response';
 import { StokcRequestDto } from '../../shared/models/stock-request-dto';
-import { InventoryMovement } from '../../shared/models/inventory-movement';
 
 @Injectable({
   providedIn: 'root'
@@ -29,12 +28,13 @@ export class ProductService {
         .pipe(map(res => res.data));
     }
 
-    getInventoryValue(): Observable<number> {
-      return this.http.get<number>(`${this.apiUrl}${this.apiPath}/inventory-value`);
+    getInventoryValue(): Observable<ApiResponse<number>> {
+      return this.http.get<ApiResponse<number>>(`${this.apiUrl}${this.apiPath}/inventory-value`);
     }
 
     getLowStock(): Observable<Product[]> {
-      return this.http.get<Product[]>(`${this.apiUrl}${this.apiPath}/low-stock`);
+      return this.http.get<ApiResponse<Product[]>>(`${this.apiUrl}${this.apiPath}/low-stock`)
+      .pipe(map(res => res.data));
     }
 
     createProduct(productRequestDto: ProductRequestDto): Observable<ApiResponse<Product>> {
@@ -45,12 +45,12 @@ export class ProductService {
       return this.http.put<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}`, productRequestDto);
     }
 
-    activateProduct(id: number): Observable<Product> {
-      return this.http.patch<Product>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
+    activateProduct(id: number): Observable<ApiResponse<Product>> {
+      return this.http.patch<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}/activate`, null);
     }
 
-    desactivateProduct(id: number): Observable<Product> {
-      return this.http.patch<Product>(`${this.apiUrl}${this.apiPath}/${id}/desactivate`, null);
+    desactivateProduct(id: number): Observable<ApiResponse<Product>> {
+      return this.http.patch<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}/desactivate`, null);
     }
 
     updateStock(id: number, stockRequestDto: StokcRequestDto): Observable<ApiResponse<Product>> {
@@ -59,6 +59,10 @@ export class ProductService {
 
     getProductById(id: number): Observable<ApiResponse<Product>> {
       return this.http.get<ApiResponse<Product>>(`${this.apiUrl}${this.apiPath}/${id}`);
+    }
+
+    countActiveProducts(): Observable<ApiResponse<number>> {
+      return this.http.get<ApiResponse<number>>(`${this.apiUrl}${this.apiPath}/count/active`);
     }
 
 }

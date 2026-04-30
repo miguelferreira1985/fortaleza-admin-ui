@@ -60,8 +60,7 @@ export class UserComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error(err);
-        this.notify.error('Error', 'No se pudieron cargar los usuarios');
+        this.notify.error('Error', 'Error al cargar los usuarios')
         this.isLoading = false;
       }
     });
@@ -97,10 +96,13 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   activateUser(user: User): void {
     this.notify.confirm('¿Activar usuario?', `¿Activas al usuario "${user.username}"?`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confimed) => {
+        if (confimed) {
           this.userService.activateUser(user.id as number).subscribe({
-            next: () => { this.notify.success('¡Activado!'); this.loadUsers(); },
+            next: (res) => {
+              this.notify.success('¡Activado!', res.message || 'El usario ha sido activado');
+              this.loadUsers();
+            },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }
@@ -109,10 +111,12 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   deactivateUser(user: User): void {
     this.notify.confirm('¿Desactivar usuario?', `¿Desactivas al usuario "${user.username}"?`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confimed) => {
+        if (confimed) {
           this.userService.desactivateUser(user.id as number).subscribe({
-            next: () => { this.notify.success('¡Desactivado!'); this.loadUsers(); },
+            next: (res) => {
+              this.notify.success('¡Activado!', res.message || 'El usario ha sido desactivado');
+              this.loadUsers(); },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }
@@ -121,10 +125,12 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   unblockUser(user: User): void {
     this.notify.confirm('¿Desbloquear usuario?', `¿Desbloqueas al usuario "${user.username}"?`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confirmed) => {
+        if (confirmed) {
           this.userService.unblockUser(user.id as number).subscribe({
-            next: () => { this.notify.success('¡Desbloqueado!'); this.loadUsers(); },
+            next: (res) => {
+              this.notify.success('¡Desbloqueado!', res.message || 'El usuario ha sido desbloqueado');
+              this.loadUsers(); },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }
@@ -133,10 +139,12 @@ export class UserComponent implements OnInit, AfterViewInit {
 
   deleteUser(user: User): void {
     this.notify.confirm('¿Eliminar usuario?', `Esta acción es irreversible. ¿Eliminas a "${user.username}"?`)
-      .then(r => {
-        if (r.isConfirmed) {
+      .then((confirmed) => {
+        if (confirmed) {
           this.userService.deleteUser(user.id as number).subscribe({
-            next: () => { this.notify.success('¡Eliminado!'); this.loadUsers(); },
+            next: (res) => {
+              this.notify.success('¡Eliminado!', res.message || 'El usuario fue eliminado');
+              this.loadUsers(); },
             error: err => this.notify.error('Error', err.error?.message)
           });
         }

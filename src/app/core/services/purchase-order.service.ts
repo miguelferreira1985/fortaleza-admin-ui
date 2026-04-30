@@ -35,7 +35,11 @@ export class PurchaseOrderService {
   }
 
   updateOldOrder(id: number, dto: any): Observable<any> {
-  return this.http.put<any>(`${this.baseUrl}/${id}`, dto);
-}
+    return this.http.put<any>(`${this.baseUrl}/${id}`, dto);
+  }
+
+  countByStatus(status: string): Observable<ApiResponse<number>> {
+    return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count?status=${status}`);
+  }
 
 }

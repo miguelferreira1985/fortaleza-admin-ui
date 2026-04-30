@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PurchaseOrderService } from '../../../core/services/purchase-order.service';
 import { SupplierService } from '../../../core/services/supplier.service';
@@ -10,6 +10,7 @@ import { PurchaseOrderStatus } from '../../../shared/models/purchase-order-statu
 import { getStatusConfig } from '../../../core/utils/purchase-order-status.util';
 import { PurchaseOrder, PurchaseOrderItemRequest, PurchaseOrderRequest } from '../../../shared/models/purchase-order.models';
 import { Product } from '../../../shared/models/product';
+import { map, Observable, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-supplier-purchase-order.component',
@@ -17,6 +18,7 @@ import { Product } from '../../../shared/models/product';
     CommonModule,
     MaterialModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterLink
   ],
   templateUrl: './supplier-purchase-order.component.html',
@@ -42,9 +44,13 @@ export class SupplierPurchaseOrderComponent implements OnInit {
   products: Product[] = [];
   draftItems: { product: Product; quantity: number }[] = [];
 
+  productSearchControl = new FormControl('');
+  filteredProducts$!: Observable<Product[]>;
+
   orderForm!: FormGroup;
 
-  // Columnas de la tabla de historial
+  today = new Date();
+
   displayedColumns = ['id', 'createdDateTime', 'expectedDeliveryDate', 'status', 'totalWithTaxes', 'actions'];
 
   ngOnInit(): void {
@@ -53,6 +59,7 @@ export class SupplierPurchaseOrderComponent implements OnInit {
     this.loadSupplierInfo();
     this.loadOrders();
     this.loadProducts();
+    this.setupAutocomplete();
   }
 
   loadSupplierInfo(): void {
@@ -74,9 +81,44 @@ export class SupplierPurchaseOrderComponent implements OnInit {
 
   loadProducts(): void {
     this.supplierService.getProductsBySupplier(this.supplierId, true).subscribe({
-      next: res => this.products = (res.data ?? res),
+      next: res => {
+        this.products = (res.data ?? res);
+        this.setupAutocomplete();
+      },
       error: err => console.error(err)
     });
+  }
+
+  setupAutocomplete(): void {
+    this.filteredProducts$ = this.productSearchControl.valueChanges.pipe(
+      startWith(''),
+      map(value => {
+        const searchText = typeof value === 'string' ? value : '';
+        return this.filterProducts(searchText);
+      })
+    );
+  }
+
+  displayProduct(product: Product | null): string {
+    return product ? `${product.name} (${product.code})` : '';
+  }
+
+  onProductSelected(product: Product): void {
+    this.orderForm.patchValue({ productId: product.id });
+
+    setTimeout(() => {
+      const qtyInput = document.querySelector('input[formControlName="quantity"]') as HTMLInputElement;
+      qtyInput?.focus();
+    }, 100);
+  }
+
+  onQuantityBlur(item: { product: Product; quantity: number }): void {
+    if(item.quantity <= 0) {
+      item.quantity = 0.01;
+      this.notify.warning('Cantidad inválida', 'La cantidad debe ser mayor a 0');
+    }
+
+    item.quantity = Math.round(item.quantity * 100) / 100;
   }
 
   get draftTotalQuantity(): number {
@@ -105,14 +147,21 @@ export class SupplierPurchaseOrderComponent implements OnInit {
     }
 
     this.orderForm.patchValue({ productId: null, quantity: null });
+    this.productSearchControl.setValue('');
     this.orderForm.get('productId')?.markAsPristine();
     this.orderForm.get('productId')?.markAsUntouched();
     this.orderForm.get('quantity')?.markAsPristine();
     this.orderForm.get('quantity')?.markAsUntouched();
+
+    setTimeout(() => {
+      const autoInput = document.querySelector('input[formControl]') as HTMLInputElement;
+      autoInput?.focus();
+    }, 100);
   }
 
   removeDraftItem(productId: number): void {
     this.draftItems = this.draftItems.filter(i => i.product.id !== productId);
+    this.setupAutocomplete();
   }
 
   createOrder(): void {
@@ -165,6 +214,26 @@ export class SupplierPurchaseOrderComponent implements OnInit {
       expectedDeliveryDate: [null],
       productId: [null, Validators.required],
       quantity:  [null, [Validators.required, Validators.min(0.01)]]
+    });
+  }
+
+  private filterProducts(searchText: string): Product[] {
+    const filterValue = searchText.toLowerCase().trim();
+    const addedIds = this.draftItems.map(item => item.product.id);
+
+    return this.products.filter(product => {
+      if (addedIds.includes(product.id)) {
+        return false;
+      }
+
+      if (!filterValue) {
+        return true;
+      }
+
+      const matchesName = product.name.toLowerCase().includes(filterValue);
+      const matchesCode = product.code.toLowerCase().includes(filterValue);
+
+      return matchesName || matchesCode;
     });
   }
 
