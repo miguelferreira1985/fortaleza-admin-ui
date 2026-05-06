@@ -1,0 +1,133 @@
+// billing-list.component.scss
+
+$primary: #880e4f;
+$accent:  #e91e63;
+$light:   #fce4ec;
+$mid:     #f8bbd0;
+
+// ── Header ────────────────────────────────────────────────────
+.page-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem;
+
+  h1 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.5rem; font-weight: 600; color: $primary; margin: 0;
+    mat-icon { font-size: 1.7rem; width: 1.7rem; height: 1.7rem; color: $accent; }
+  }
+}
+
+// ── Filtros de periodo ────────────────────────────────────────
+.period-card {
+  background: white; border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+
+  .period-fields {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    mat-form-field {
+      width: 180px;
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper { display: none; }
+    }
+  }
+
+  .period-hint { font-size: 0.8rem; color: #888; margin: 8px 0 0; }
+}
+
+.search-btn {
+  height: 48px; font-weight: 600; border-radius: 10px !important;
+  min-width: 130px;
+}
+
+// ── Lista de clientes ─────────────────────────────────────────
+.content-card {
+  background: white; border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 1rem;
+}
+
+.clients-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.client-card {
+  border: 2px solid $mid; border-radius: 12px;
+  padding: 16px 18px; cursor: pointer;
+  transition: all 0.15s; background: white;
+
+  &:hover {
+    border-color: $accent; background: #fff5f8;
+    box-shadow: 0 4px 16px rgba(233,30,99,0.1);
+    transform: translateY(-2px);
+  }
+
+  .client-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 12px;
+
+    .client-info {
+      display: flex; flex-direction: column; gap: 4px;
+      .client-name {
+        font-size: 1.1rem; font-weight: 700; color: $primary;
+      }
+      .client-rfc  {
+        font-size: 0.8rem; color: #888; font-family: monospace;
+      }
+    }
+
+    .sales-badge {
+      background: $light; color: $primary; font-size: 0.8rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 12px;
+    }
+  }
+
+  .client-stats {
+    display: flex; gap: 16px; margin-bottom: 12px;
+    padding: 12px 0; border-top: 1px solid $light; border-bottom: 1px solid $light;
+
+    .stat-item {
+      display: flex; align-items: center; gap: 10px; flex: 1;
+
+      mat-icon {
+        font-size: 28px; width: 28px; height: 28px; color: $accent;
+      }
+
+      .stat-content {
+        display: flex; flex-direction: column; gap: 2px;
+
+        .stat-label {
+          font-size: 0.75rem; color: #888; text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+          font-size: 1.1rem; font-weight: 700; color: $primary;
+        }
+      }
+    }
+  }
+
+  .client-footer {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    padding-top: 8px;
+
+    .see-detail {
+      font-size: 0.85rem; font-weight: 600; color: $accent;
+    }
+
+    .arrow {
+      color: $accent; font-size: 20px;
+    }
+  }
+}
+
+// ── Loading y empty ───────────────────────────────────────────
+.loading-center {
+  display: flex; justify-content: center; padding: 48px;
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px; gap: 12px; color: #bbb;
+  mat-icon { font-size: 4rem; width: 4rem; height: 4rem; }
+  p { font-size: 1rem; margin: 0; text-align: center; }
+}

@@ -129,9 +129,30 @@ export interface BillingClientSummary {
   clientId: number;
   clientName: string;
   clientRfc: string;
-  totalSales: number;             // cantidad de ventas pendientes
-  totalCashAmount: number;        // suma en efectivo
-  totalCardAmount: number;        // suma en tarjeta
-  totalTransferAmount: number;    // suma en transferencia
+  totalSales: number;
+  totalProducts: number;
+  totalCashAmount: number;
+  totalCardAmount: number;
+  totalTransferAmount: number;
   grandTotal: number;
+}
+
+export interface BillingClientDetail {
+  groupKey: string;
+  paymentMethod: PaymentMethod;
+  saleId: number | null;
+  folio: string;
+  saleDate: string | null;
+  total: number;
+  isGrouped: boolean;
+}
+
+export interface BillingItemDetail {
+  productId: number;
+  productName: string;
+  productCode: string;
+  quantity: number;
+  unitPrice: number;
+  dicount: number;
+  subtotal: number
 }

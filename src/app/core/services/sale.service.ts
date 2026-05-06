@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { BillingClientSummary, FreeReturnRequest, SaleCancelRequest, SaleRequest, SaleResponse, SaleReturnRequest, SaleReturnResponse } from "../../shared/models/sale.models";
+import { BillingClientDetail, BillingClientSummary, BillingItemDetail, FreeReturnRequest, PaymentMethod, SaleCancelRequest, SaleRequest, SaleResponse, SaleReturnRequest, SaleReturnResponse } from "../../shared/models/sale.models";
 import { map, Observable } from "rxjs";
 import { ApiResponse } from "../../shared/models/api-response";
 
@@ -65,8 +65,31 @@ export class SaleService {
   }
 
   getBillingClients(from: string, to: string): Observable<ApiResponse<BillingClientSummary[]>> {
-    const params = new HttpParams().set('from', from).set('to', to);
+    const params = new HttpParams()
+      .set('from', from)
+      .set('to', to);
     return this.http.get<ApiResponse<BillingClientSummary[]>>(`${this.apiUrl}${this.path}/billing/clients`, { params });
+  }
+
+  getBillingClientDetails(clientId: number, from: string, to: string): Observable<ApiResponse<BillingClientDetail[]>> {
+        const params = new HttpParams()
+      .set('from', from)
+      .set('to', to);
+      return this.http.get<ApiResponse<BillingClientDetail[]>>(`${this.apiUrl}${this.path}/billing/clients/${clientId}/details`, { params });
+  }
+
+    getBillingItems(clientId: number, from: string, to: string, paymentMethod: PaymentMethod, saleId: number | null): Observable<ApiResponse<BillingItemDetail[]>> {
+    let params = new HttpParams()
+      .set('clientId', clientId.toString())
+      .set('from', from)
+      .set('to', to)
+      .set('paymentMethod', paymentMethod);
+
+    if (saleId !== null) {
+      params = params.set('saleId', saleId.toString());
+    }
+
+    return this.http.get<ApiResponse<BillingItemDetail[]>>(`${this.apiUrl}${this.path}/billing/items`, { params });
   }
 
   getBillingSalesByClient(clientId: number, from: string, to: string): Observable<ApiResponse<SaleResponse[]>> {

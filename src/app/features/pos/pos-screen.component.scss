@@ -63,7 +63,7 @@ $touch-min:  48px;   // mínimo para touch targets
 .pos-layout {
   display: grid;
   grid-template-columns: 1fr 420px;
-  height: calc(100vh - 60px);
+  height: calc(90vh - 60px);
   overflow: hidden;
   background: #f5f5f5;
 

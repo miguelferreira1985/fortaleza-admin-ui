@@ -18,6 +18,7 @@ import { PaymentActivePipe } from '../../shared/pipes/payment-active.pipe';
 import { CashMovementDialogComponent } from './cash-movement-dialog/cash-movement-dialog.component';
 import { SaleReceiptDialogComponent } from './sale-receipt-dialog/sale-receipt-dialog.component';
 import { HasRoleDirective } from '../../core/directives/has-role.directive';
+import { CashCutReportDialogComponent } from './cash-cut-report-dialog.component/cash-cut-report-dialog.component';
 
 @Component({
   selector: 'app-pps-screen.component',
@@ -188,10 +189,19 @@ export class PosScreenComponent implements OnInit {
         this.cashService.closeSession(this.activeSession.id, {
           declaredCash: result.value
         }).subscribe({
-          next: () => {
-            this.notify.success('¡Caja cerrada!', 'La sesión fue cerrada exitosamente');
-            this.activeSession = null;
-            this.router.navigate(['/dashboard']);
+          next: (res) => {
+            const dialogRef = this.dialog.open(CashCutReportDialogComponent, {
+              width: '500px',
+              data: { session: res.data },
+              disableClose: true,
+              panelClass: 'cash-cut-dialog'
+            });
+
+            dialogRef.afterClosed().subscribe(() => {
+              this.notify.success('¡Caja cerrada!', 'La sesión fue cerrada exitosamente');
+              this.activeSession = null;
+              this.router.navigate(['/dashboard']);
+            });
           },
           error: err => this.notify.error('Error', err.error?.message)
         });
@@ -214,9 +224,12 @@ export class PosScreenComponent implements OnInit {
     this.isLoadingProducts = true;
     this.productService.getProducts(true).subscribe({
       next: (data) => {
-        this.allProducts = data.filter(p => p.stock > 0);
+        this.allProducts = data;
+        // Comentado hasta que se haya creado el inventario para permitir ventas de todos los productos
+        //this.allProducts = data.filter(p => p.stock > 0);
         this.filteredProducts = [...this.allProducts];
         this.isLoadingProducts = false;
+        this.productSearch = '';
       },
       error: () => { this.isLoadingProducts = false; }
     });
@@ -224,21 +237,25 @@ export class PosScreenComponent implements OnInit {
 
   filterProducts(): void {
     const term = this.productSearch.toLowerCase().trim();
-    if (!term) {
-      this.filteredProducts = this.allProducts.filter(p =>
+
+    this.filteredProducts = !term
+      ? [...this.allProducts]
+      : this.allProducts.filter(p =>
         p.name.toLowerCase().includes(term) ||
         p.code.toLowerCase().includes(term)
       );
-    }
   }
 
     addToCart(product: Product): void {
     const existing = this.cart.find(i => i.product.id === product.id);
     if (existing) {
+      // Remover comentario cuando el inventario sea completado
+      /*
       if (existing.quantity >= product.stock) {
         this.notify.warning('Stock insuficiente', `Solo hay ${product.stock} unidades disponibles`);
         return;
       }
+      */
       existing.quantity++;
       this.recalculateItem(existing);
     } else {
@@ -260,10 +277,15 @@ export class PosScreenComponent implements OnInit {
   }
 
   increaseQty(item: CartItem): void {
+
+    // Remover cuando el inventario sea completado
+
+    /*
     if (item.quantity >= item.product.stock) {
       this.notify.warning('Stock insuficiente', `Solo hay ${item.product.stock} disponibles`);
       return;
     }
+    */
     item.quantity++;
     this.recalculateItem(item);
     this.recalculatePayments();
@@ -318,8 +340,6 @@ export class PosScreenComponent implements OnInit {
     item.subtotal = Math.round(item.product.price * item.quantity * factor * 100) / 100;
   }
 
-  // ── Pagos ─────────────────────────────────────────────────
-
   togglePaymentMethod(method: PaymentMethod): void {
     const existing = this.payments.find(p => p.paymentMethod === method);
 
@@ -335,7 +355,6 @@ export class PosScreenComponent implements OnInit {
 
   onPaymentAmountChange(payment: CartPayment): void {
     if (!payment.amount || payment.amount < 0) payment.amount = 0;
-    // Si solo queda un método → se ajusta automáticamente al total
     if (this.payments.length === 1) {
       payment.amount = this.cartTotal;
     }
@@ -357,8 +376,6 @@ export class PosScreenComponent implements OnInit {
     const cashNeeded = this.cartTotal - otherPayments;
     return Math.max(0, this.cashReceived - cashNeeded);
   }
-
-  // ── Cliente ───────────────────────────────────────────────
 
   loadClients(): void {
     this.clientService.getClients().subscribe({
@@ -386,8 +403,6 @@ export class PosScreenComponent implements OnInit {
     this.clientSearch = '';
     this.toBeBilled = false;
   }
-
-  // ── Cobrar ────────────────────────────────────────────────
 
   async charge(): Promise<void> {
     if (!this.isReadyToCharge) return;
@@ -496,8 +511,6 @@ export class PosScreenComponent implements OnInit {
       panelClass: 'receipt-dialog'
     });
   }
-
-  // ── Utilidades template ───────────────────────────────────
 
   trackByProductId(_: number, p: Product): number { return p.id!; }
   trackByCartItem(_: number, i: CartItem): number { return i.product.id; }

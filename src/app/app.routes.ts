@@ -154,7 +154,21 @@ export const routes: Routes = [
       {
         path: 'pos/billing',
         loadComponent: () =>
-          import('./features/pos/billing-dashboard.component/billing-dashboard.component').then(m => m.BillingDashboardComponent),
+          import('./features/pos/billing-list.component/billing-list.component').then(m => m.BillingListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/billing/client/:clientId',
+        loadComponent: () =>
+          import('./features/pos/billing-client-detail.component/billing-client-detail.component').then(m => m.BillingClientDetailComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/billing/items',
+        loadComponent: () =>
+          import('./features/pos/billing-sale-detail.component/billing-sale-detail.component').then(m => m.BillingSaleDetailComponent),
         canActivate: [authGuard],
         data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
       },

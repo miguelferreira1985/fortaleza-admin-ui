@@ -1,0 +1,97 @@
+<!-- billing-list.component.html -->
+
+<div class="page-header">
+  <h1>
+    <mat-icon>receipt</mat-icon>
+    Facturación
+  </h1>
+</div>
+
+<!-- Filtro de periodo -->
+<div class="period-card">
+  <div class="period-fields">
+<mat-form-field appearance="outline">
+  <mat-label>Desde</mat-label>
+  <input matInput [matDatepicker]="pickerFrom"
+         [(ngModel)]="dateFrom" readonly>
+  <mat-datepicker-toggle matSuffix [for]="pickerFrom">
+    <mat-icon matDatepickerToggleIcon>date_range</mat-icon>
+  </mat-datepicker-toggle>
+  <mat-datepicker #pickerFrom></mat-datepicker>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-label>Hasta</mat-label>
+  <input matInput [matDatepicker]="pickerTo"
+         [(ngModel)]="dateTo" readonly>
+  <mat-datepicker-toggle matSuffix [for]="pickerTo">
+    <mat-icon matDatepickerToggleIcon>date_range</mat-icon>
+  </mat-datepicker-toggle>
+  <mat-datepicker #pickerTo></mat-datepicker>
+</mat-form-field>
+
+    <button mat-raised-button color="primary" class="search-btn"
+      (click)="loadClients()" [disabled]="isLoading">
+      @if (isLoading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <mat-icon>search</mat-icon>
+      }
+      Buscar
+    </button>
+  </div>
+
+  <p class="period-hint">
+    Clientes con ventas marcadas para facturar en el periodo seleccionado
+  </p>
+</div>
+
+<!-- Lista de clientes -->
+<div class="content-card">
+  @if (isLoading) {
+    <div class="loading-center"><mat-spinner diameter="48"></mat-spinner></div>
+  } @else if (clients.length === 0) {
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>No hay ventas pendientes de facturar en este periodo</p>
+    </div>
+  } @else {
+    <div class="clients-list">
+      @for (client of clients; track client.clientId) {
+        <div class="client-card" (click)="openClientDetail(client)">
+          <div class="client-header">
+            <div class="client-info">
+              <span class="client-name">{{ client.clientName }}</span>
+              <span class="client-rfc">RFC: {{ client.clientRfc }}</span>
+            </div>
+            <span class="sales-badge">
+              {{ client.totalSales }} venta{{ client.totalSales !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <div class="client-stats">
+            <div class="stat-item">
+              <mat-icon>shopping_cart</mat-icon>
+              <div class="stat-content">
+                <span class="stat-label">Productos</span>
+                <span class="stat-value">{{ client.totalProducts }}</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>payments</mat-icon>
+              <div class="stat-content">
+                <span class="stat-label">Total a facturar</span>
+                <span class="stat-value">{{ client.grandTotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="client-footer">
+            <span class="see-detail">Ver detalle</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

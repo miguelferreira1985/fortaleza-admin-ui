@@ -90,7 +90,7 @@ export class SaleListComponent implements OnInit, AfterViewInit {
   }
 
   goToPOS(): void {
-    this.router.navigate(['/pos']);
+    this.router.navigate(['/pos/cashier']);
   }
 
   getStatusConfig(status: SaleStatus) {

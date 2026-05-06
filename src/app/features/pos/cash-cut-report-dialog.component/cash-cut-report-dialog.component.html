@@ -1,0 +1,258 @@
+<!-- cash-cut-report-dialog.component.html -->
+
+<div class="dialog-container">
+
+  <!-- Header del diálogo -->
+  <div class="dialog-header" mat-dialog-title>
+    <div class="header-content">
+      <mat-icon class="header-icon">receipt_long</mat-icon>
+      <div>
+        <h2>Corte de Caja</h2>
+        <p class="header-subtitle">Sesión #{{ session.id }}</p>
+      </div>
+    </div>
+    <button mat-icon-button class="close-btn no-print" (click)="close()" matTooltip="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Contenido del reporte -->
+  <div mat-dialog-content class="dialog-content">
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Generando reporte...</p>
+      </div>
+    } @else {
+
+      <div class="cut-report">
+
+        <!-- Información del cajero y periodo -->
+        <div class="report-section">
+          <div class="info-row">
+            <mat-icon>person</mat-icon>
+            <span class="label">Cajero:</span>
+            <strong>{{ session.employeeName }}</strong>
+          </div>
+          <div class="info-row">
+            <mat-icon>event</mat-icon>
+            <span class="label">Apertura:</span>
+            <strong>{{ session.openingDateTime | date:'dd/MM/yyyy HH:mm' }}</strong>
+          </div>
+          <div class="info-row">
+            <mat-icon>event</mat-icon>
+            <span class="label">Cierre:</span>
+            <strong>{{ session.closingDateTime | date:'dd/MM/yyyy HH:mm' }}</strong>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ════ EFECTIVO ════ -->
+        <div class="report-section">
+          <div class="section-title">
+            <mat-icon>payments</mat-icon>
+            EFECTIVO
+          </div>
+
+          <div class="detail-row">
+            <span>Fondo inicial</span>
+            <span>{{ session.openingAmount | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+
+          @if (cutReport) {
+            <div class="detail-row">
+              <span>Ventas en efectivo</span>
+              <span>{{ cutReport.totalCashSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+
+            @if (cutReport.totalCashInflows > 0) {
+              <div class="detail-row positive">
+                <span>+ Entradas de efectivo</span>
+                <span>{{ cutReport.totalCashInflows | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+
+            @if (cutReport.totalCashOutflows > 0) {
+              <div class="detail-row negative">
+                <span>− Salidas de efectivo</span>
+                <span>{{ cutReport.totalCashOutflows | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+
+            @if (cutReport.totalCashRefunds > 0) {
+              <div class="detail-row negative">
+                <span>− Devoluciones en efectivo</span>
+                <span>{{ cutReport.totalCashRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+          }
+
+          <div class="detail-row total">
+            <span>Efectivo esperado</span>
+            <strong>{{ session.expectedCash | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+
+          <div class="detail-row declared">
+            <span>Efectivo declarado</span>
+            <strong>{{ session.declaredCash | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+
+          @if (hasDifference) {
+            <div class="detail-row difference" [ngClass]="differenceClass">
+              <span>
+                <mat-icon>{{ differenceIcon }}</mat-icon>
+                Diferencia
+              </span>
+              <strong>{{ session.cashDifference | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          } @else {
+            <div class="detail-row difference exact">
+              <span>
+                <mat-icon>check_circle</mat-icon>
+                Sin diferencia
+              </span>
+              <strong>$0.00</strong>
+            </div>
+          }
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ════ TARJETA ════ -->
+        @if (cutReport && (cutReport.totalCardSales > 0 || cutReport.totalCardRefunds > 0)) {
+          <div class="report-section">
+            <div class="section-title card">
+              <mat-icon>credit_card</mat-icon>
+              TARJETA
+            </div>
+
+            <div class="detail-row">
+              <span>Ventas con tarjeta</span>
+              <span>{{ cutReport.totalCardSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+
+            @if (cutReport.totalCardRefunds > 0) {
+              <div class="detail-row negative">
+                <span>− Devoluciones con tarjeta</span>
+                <span>{{ cutReport.totalCardRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+
+            <div class="detail-row total">
+              <span>Total neto tarjeta</span>
+              <strong>{{ cutReport.netCardTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+        }
+
+        <!-- ════ TRANSFERENCIA ════ -->
+        @if (cutReport && (cutReport.totalTransferSales > 0 || cutReport.totalTransferRefunds > 0)) {
+          <div class="report-section">
+            <div class="section-title transfer">
+              <mat-icon>account_balance</mat-icon>
+              TRANSFERENCIA
+            </div>
+
+            <div class="detail-row">
+              <span>Ventas por transferencia</span>
+              <span>{{ cutReport.totalTransferSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+
+            @if (cutReport.totalTransferRefunds > 0) {
+              <div class="detail-row negative">
+                <span>− Devoluciones por transferencia</span>
+                <span>{{ cutReport.totalTransferRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+
+            <div class="detail-row total">
+              <span>Total neto transferencia</span>
+              <strong>{{ cutReport.netTransferTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+        }
+
+        <!-- ════ TOTAL GENERAL ════ -->
+        @if (cutReport) {
+          <div class="report-section grand-total">
+            <div class="detail-row final">
+              <span>TOTAL DE VENTAS</span>
+              <strong>{{ cutReport.grandTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          </div>
+        }
+
+        <!-- Notas del cierre -->
+        @if (session.notes) {
+          <div class="divider"></div>
+          <div class="report-section">
+            <div class="section-title">
+              <mat-icon>note</mat-icon>
+              NOTAS
+            </div>
+            <p class="notes-text">{{ session.notes }}</p>
+          </div>
+        }
+
+        <!-- Movimientos de efectivo -->
+        @if (session.movements && session.movements.length > 0) {
+          <div class="divider"></div>
+          <div class="report-section">
+            <div class="section-title">
+              <mat-icon>swap_vert</mat-icon>
+              MOVIMIENTOS DE EFECTIVO
+            </div>
+            @for (mov of session.movements; track mov.id) {
+              <div class="movement-row" [ngClass]="mov.type === 'ENTRADA' ? 'positive' : 'negative'">
+                <div class="movement-info">
+                  <mat-icon>{{ mov.type === 'ENTRADA' ? 'add_circle' : 'remove_circle' }}</mat-icon>
+                  <span class="movement-reason">{{ mov.reason }}</span>
+                </div>
+                <span class="movement-amount">
+                  {{ mov.type === 'ENTRADA' ? '+' : '−' }}{{ mov.amount | currency:'MXN':'symbol':'1.2-2' }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Pie del reporte -->
+        <div class="report-footer">
+          <p class="footer-text">La Fortaleza</p>
+          <p class="footer-date">{{ session.closingDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+
+      </div>
+
+    }
+
+  </div>
+
+  <!-- Acciones del diálogo -->
+  <div mat-dialog-actions class="dialog-actions no-print">
+    <button mat-stroked-button (click)="close()" class="cancel-btn">
+      <mat-icon>close</mat-icon>
+      Cerrar
+    </button>
+    <button mat-raised-button color="primary" (click)="print()" class="print-btn">
+      <mat-icon>print</mat-icon>
+      Imprimir
+    </button>
+  </div>
+
+</div>
+
+<!-- Estilos de impresión -->
+<style>
+@media print {
+  .no-print { display: none !important; }
+  .dialog-container { box-shadow: none !important; }
+  .cut-report { padding: 0 !important; }
+}
+</style>
