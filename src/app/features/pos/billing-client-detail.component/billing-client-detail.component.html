@@ -1,0 +1,155 @@
+<!-- billing-client-detail.component.html -->
+
+<div class="page-header">
+  <button mat-icon-button (click)="goBack()" class="back-btn" matTooltip="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <div>
+    <h1>
+      <mat-icon>person</mat-icon>
+      {{ clientName }}
+    </h1>
+    <span class="header-subtitle">
+      RFC: {{ clientRfc }} · {{ dateFrom | date:'dd/MM/yy' }} — {{ dateTo | date:'dd/MM/yy' }}
+    </span>
+  </div>
+</div>
+
+@if (isLoading) {
+  <div class="loading-center"><mat-spinner diameter="48"></mat-spinner></div>
+} @else {
+
+<div class="detail-layout">
+
+  <!-- ════ EFECTIVO — Una sola factura para todo ══════════════ -->
+  @if (cashSales.length > 0) {
+  <div class="billing-section" id="cash-billing-section">
+    <div class="section-header">
+      <div class="section-title cash">
+        <mat-icon>payments</mat-icon>
+        Ventas en Efectivo
+        <span class="section-hint">Una sola factura por todas estas ventas</span>
+      </div>
+      <button mat-stroked-button class="print-btn" (click)="printCashReport()">
+        <mat-icon>print</mat-icon>
+        Imprimir reporte
+      </button>
+    </div>
+
+    <div class="sales-list">
+      @for (sale of cashSales; track sale.groupKey) {
+        <div class="sale-card cash-card" (click)="viewSaleDetail(sale)">
+          <div class="sale-header">
+            <div class="sale-info">
+              <span class="folio-badge">{{ sale.folio }}</span>
+              <span class="accumulated-note">Compras en efectivo del período</span>
+            </div>
+            <span class="amount cash">{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="sale-footer">
+            <span class="see-items">Ver productos acumulados</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="section-total cash">
+      <span>TOTAL EFECTIVO</span>
+      <strong>{{ cashTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+  </div>
+  }
+
+  <!-- ════ TARJETA — Una factura por operación ════════════════ -->
+  @if (cardSales.length > 0) {
+  <div class="billing-section">
+    <div class="section-header">
+      <div class="section-title card">
+        <mat-icon>credit_card</mat-icon>
+        Ventas con Tarjeta
+        <span class="section-hint">Una factura por cada operación</span>
+      </div>
+    </div>
+
+    <div class="sales-list">
+      @for (sale of cardSales; track sale.groupKey) {
+        <div class="sale-card card-card" (click)="viewSaleDetail(sale)">
+          <div class="sale-header">
+            <div class="sale-info">
+              <span class="folio">{{ sale.folio }}</span>
+              <span class="date">{{ sale.saleDate | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            <span class="amount card">{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="sale-footer">
+            <span class="see-items">Ver ticket</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="section-total card">
+      <span>TOTAL TARJETA</span>
+      <strong>{{ cardTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+  </div>
+  }
+
+  <!-- ════ TRANSFERENCIA — Una factura por operación ══════════ -->
+  @if (transferSales.length > 0) {
+  <div class="billing-section">
+    <div class="section-header">
+      <div class="section-title transfer">
+        <mat-icon>account_balance</mat-icon>
+        Ventas por Transferencia
+        <span class="section-hint">Una factura por cada operación</span>
+      </div>
+    </div>
+
+    <div class="sales-list">
+      @for (sale of transferSales; track sale.groupKey) {
+        <div class="sale-card transfer-card" (click)="viewSaleDetail(sale)">
+          <div class="sale-header">
+            <div class="sale-info">
+              <span class="folio">{{ sale.folio }}</span>
+              <span class="date">{{ sale.saleDate | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            <span class="amount transfer">{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="sale-footer">
+            <span class="see-items">Ver ticket</span>
+            <mat-icon class="arrow">chevron_right</mat-icon>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="section-total transfer">
+      <span>TOTAL TRANSFERENCIA</span>
+      <strong>{{ transferTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+  </div>
+  }
+
+  <!-- Sin ventas -->
+  @if (sales.length === 0) {
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>Este cliente no tiene ventas pendientes de facturar en este periodo</p>
+    </div>
+  }
+
+</div>
+
+}
+
+<!-- Print styles -->
+<style>
+@media print {
+  .billing-section:not(#cash-billing-section) { display: none !important; }
+  .page-header, .print-btn { display: none !important; }
+  .billing-section { box-shadow: none; }
+}
+</style>

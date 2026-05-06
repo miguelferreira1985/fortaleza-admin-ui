@@ -1,0 +1,224 @@
+// billing-sale-detail.component.scss
+
+$primary: #880e4f;
+$accent:  #e91e63;
+$light:   #fce4ec;
+$mid:     #f8bbd0;
+
+// ── Header ────────────────────────────────────────────────────
+.page-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+
+  .back-btn { color: $accent; }
+
+  .header-content {
+    flex: 1;
+
+    h1 {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.4rem; font-weight: 700; color: $primary; margin: 0;
+      mat-icon { font-size: 1.6rem; width: 1.6rem; height: 1.6rem; color: $accent; }
+    }
+
+    .header-info {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 6px; flex-wrap: wrap;
+
+      .client-name {
+        font-size: 0.9rem; color: #666; font-weight: 500;
+      }
+
+      .period-badge {
+        font-size: 0.75rem; color: #888;
+        background: #f5f5f5; padding: 3px 10px; border-radius: 8px;
+      }
+    }
+  }
+
+  .print-btn {
+    border-color: #1565c0 !important; color: #1565c0 !important;
+    border-radius: 8px !important;
+    &:hover { background: #e3f2fd; }
+  }
+}
+
+// ── Ticket card ───────────────────────────────────────────────
+.ticket-card {
+  background: white; border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 20px;
+  max-width: 900px; margin: 0 auto;
+}
+
+.ticket-header {
+  display: flex; flex-direction: column; gap: 12px;
+  padding-bottom: 16px; border-bottom: 2px solid $light;
+  margin-bottom: 16px;
+
+  .method-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 10px;
+    font-size: 0.9rem; font-weight: 600;
+    width: fit-content;
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+    &.cash {
+      background: #e8f5e9; color: #2e7d32;
+      mat-icon { color: #2e7d32; }
+    }
+    &.card {
+      background: #e3f2fd; color: #1565c0;
+      mat-icon { color: #1565c0; }
+    }
+    &.transfer {
+      background: #f3e5f5; color: #6a1b9a;
+      mat-icon { color: #6a1b9a; }
+    }
+  }
+
+  .info-alert {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px; background: #fff3e0; border-radius: 8px;
+    font-size: 0.8rem; color: #e65100;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+}
+
+// ── Lista de items ────────────────────────────────────────────
+.items-list {
+  .list-header {
+    display: grid;
+    grid-template-columns: 1fr 100px 120px 120px;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 2px solid $mid;
+    font-size: 0.8rem; font-weight: 700;
+    color: $primary; text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 120px 120px;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid $light;
+    align-items: center;
+
+    &:last-child { border-bottom: none; }
+
+    .product-info {
+      display: flex; flex-direction: column; gap: 4px;
+
+      .product-name {
+        font-size: 0.95rem; font-weight: 600; color: #333;
+      }
+
+      .product-code {
+        font-size: 0.75rem; color: #888; font-family: monospace;
+      }
+    }
+
+    .qty-col, .price-col, .total-col {
+      text-align: right; font-size: 0.9rem;
+    }
+
+    .qty-col {
+      font-weight: 700; color: $accent;
+    }
+
+    .price-col {
+      color: #666;
+    }
+
+    .total-col {
+      font-weight: 700; color: $primary;
+    }
+  }
+}
+
+// ── Resumen ───────────────────────────────────────────────────
+.ticket-summary {
+  display: flex; flex-direction: column; gap: 10px;
+  padding-top: 16px; margin-top: 16px;
+  border-top: 2px solid $mid;
+
+  .summary-row {
+    display: flex; justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem; color: #666;
+
+    strong {
+      font-size: 1.05rem; color: $primary;
+    }
+
+    &.total {
+      padding-top: 8px; margin-top: 8px;
+      border-top: 1px solid $light;
+      font-size: 1.05rem; font-weight: 600;
+
+      strong {
+        font-size: 1.4rem; color: $primary;
+      }
+    }
+  }
+}
+
+// ── Loading y empty ───────────────────────────────────────────
+.loading-center {
+  display: flex; justify-content: center; padding: 48px;
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 48px; gap: 12px; color: #bbb;
+  mat-icon { font-size: 4rem; width: 4rem; height: 4rem; }
+  p { font-size: 1rem; margin: 0; text-align: center; }
+}
+
+// ── Responsive ────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .items-list {
+    .list-header, .item-row {
+      grid-template-columns: 1fr 80px 100px 100px;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .items-list {
+    .list-header {
+      display: none;
+    }
+
+    .item-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      margin-bottom: 8px;
+
+      .product-info {
+        grid-column: 1;
+      }
+
+      .qty-col, .price-col, .total-col {
+        display: flex; justify-content: space-between;
+        text-align: left;
+
+        &::before {
+          font-weight: 600; color: #888;
+        }
+      }
+
+      .qty-col::before { content: 'Cantidad:'; }
+      .price-col::before { content: 'Precio:'; }
+      .total-col::before { content: 'Subtotal:'; }
+    }
+  }
+}

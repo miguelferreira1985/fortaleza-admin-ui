@@ -30,7 +30,7 @@ export class MainLayoutComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   currentUser: CurrentUser | null = null;
-  expandedSection = new Set<string>(['inventario', 'compras', 'crm']);
+  expandedSection = new Set<string>(['pos']);
 
   ngOnInit(): void {
     this,this.currentUser = this.autService.getCurrentUser();

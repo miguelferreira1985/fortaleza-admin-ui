@@ -1,0 +1,143 @@
+h2[mat-dialog-title] {
+  display: flex; align-items: center; gap: 8px;
+  color: #880e4f; font-size: 1.1rem;
+  mat-icon { color: #e91e63; }
+  .dialog-folio {
+    font-family: monospace; font-size: 0.85rem;
+    background: #fce4ec; color: #880e4f;
+    padding: 2px 8px; border-radius: 8px; margin-left: auto;
+  }
+}
+
+mat-dialog-content {
+  padding-top: 8px !important;
+  max-height: 65vh !important;
+}
+
+.section-label {
+  font-size: 0.78rem; font-weight: 600; color: #880e4f;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 12px 0 8px;
+}
+
+/* ── Items ──────────────────────────────────────────────────── */
+.items-list {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px;
+}
+
+.item-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px;
+  border: 2px solid #f0f0f0; cursor: pointer;
+  transition: all 0.15s; background: white;
+
+  &:hover:not(.disabled) { border-color: #f8bbd0; background: #fff5f8; }
+
+  &.selected {
+    border-color: #e91e63; background: #fff5f8;
+    .item-check mat-icon { color: #e91e63; }
+  }
+
+  &.disabled {
+    opacity: 0.5; cursor: not-allowed; background: #f9f9f9;
+  }
+
+  .item-check {
+    flex-shrink: 0;
+    mat-icon { font-size: 22px; color: #ccc; }
+  }
+
+  .item-info {
+    flex: 1; display: flex; flex-direction: column; gap: 1px;
+    .item-code { font-size: 0.72rem; font-family: monospace; color: #e91e63; }
+    .item-name { font-size: 0.9rem; font-weight: 600; color: #333; }
+    .item-meta { font-size: 0.78rem; color: #888; }
+  }
+
+  .item-stock {
+    display: flex; flex-direction: column; align-items: flex-end;
+    font-size: 0.75rem; gap: 1px;
+    .stock-label { color: #aaa; }
+    .stock-value { font-weight: 700; color: #333; font-size: 0.95rem; }
+    .returned-label { color: #e65100; }
+    .available-label { color: #2e7d32; font-weight: 600; }
+  }
+
+  .item-qty {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    label { font-size: 0.72rem; color: #888; }
+
+    .qty-controls {
+      display: flex; align-items: center; gap: 4px;
+
+      .qty-btn {
+        width: 30px; height: 30px; border-radius: 6px;
+        border: 1.5px solid #f8bbd0; background: white;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        color: #880e4f;
+        mat-icon { font-size: 16px; }
+        &:hover:not(:disabled) { background: #fce4ec; }
+        &:disabled { opacity: 0.4; cursor: not-allowed; }
+      }
+
+      .qty-input {
+        width: 52px; height: 30px; text-align: center;
+        border: 1.5px solid #f8bbd0; border-radius: 6px;
+        font-size: 0.9rem; font-weight: 700; color: #880e4f; outline: none;
+        &:focus { border-color: #e91e63; }
+        &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; }
+      }
+    }
+  }
+
+  .item-refund {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+    .refund-label { font-size: 0.72rem; color: #888; }
+    .refund-amount { font-weight: 700; color: #2e7d32; font-size: 0.95rem; }
+  }
+
+  .no-stock-badge {
+    background: #f5f5f5; color: #aaa;
+    font-size: 0.72rem; padding: 2px 8px; border-radius: 8px;
+    white-space: nowrap;
+  }
+}
+
+/* ── Métodos de reembolso ────────────────────────────────────── */
+.refund-methods {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
+}
+
+.refund-method-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  height: 64px; border-radius: 10px; border: 2px solid #e0e0e0;
+  background: white; cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; color: #666; transition: all 0.15s;
+
+  mat-icon { font-size: 22px; }
+  &:hover { border-color: #e91e63; color: #e91e63; background: #fff5f8; }
+  &.active { border-color: #e91e63; background: #e91e63; color: white; }
+}
+
+.full { width: 100%; }
+
+/* ── Resumen ─────────────────────────────────────────────────── */
+.return-summary {
+  background: #f9f9f9; border-radius: 10px;
+  padding: 12px 16px; margin-top: 4px;
+  display: flex; flex-direction: column; gap: 6px;
+
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.9rem; color: #666;
+    strong { color: #333; }
+    &.total {
+      border-top: 1px solid #e0e0e0; padding-top: 8px; margin-top: 2px;
+      font-size: 1rem; font-weight: 700; color: #333;
+      strong { color: #2e7d32; font-size: 1.15rem; }
+    }
+  }
+}
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }

@@ -1,0 +1,308 @@
+<!-- ══ HEADER DE CAJA ═══════════════════════════════════════ -->
+<div class="pos-header">
+  <div class="pos-header-left">
+    <mat-icon class="pos-logo-icon">storefront</mat-icon>
+    <span class="pos-title">La Fortaleza — POS</span>
+  </div>
+
+  @if (activeSession) {
+    <div class="pos-header-center">
+      <span class="session-info">
+        <mat-icon>account_balance_wallet</mat-icon>
+        Fondo: {{ activeSession.openingAmount | currency:'MXN':'symbol':'1.2-2' }}
+      </span>
+      <span class="cashier-info">
+        <mat-icon>badge</mat-icon>
+        {{ activeSession.employeeName }}
+      </span>
+    </div>
+
+    <div class="pos-header-right">
+      <button mat-stroked-button class="header-btn" (click)="goToSales()" matTooltip="Ver historial de ventas" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+        <mat-icon>receipt_long</mat-icon>
+        <span class="btn-label">Ventas</span>
+      </button>
+
+      <button mat-stroked-button class="header-btn" (click)="goToReturns()" matTooltip="Ver devoluciones" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+        <mat-icon>assignment_return</mat-icon>
+        <span class="btn-label">Devoluciones</span>
+      </button>
+
+      <button mat-stroked-button class="header-btn" (click)="openMovementDialog()" matTooltip="Registrar entrada/salida">
+        <mat-icon>swap_vert</mat-icon>
+        <span class="btn-label">Movimiento</span>
+      </button>
+      <button mat-stroked-button class="header-btn warn" (click)="openCloseSessionDialog()" matTooltip="Cerrar caja">
+        <mat-icon>lock</mat-icon>
+        <span class="btn-label">Cerrar caja</span>
+      </button>
+    </div>
+  }
+</div>
+
+<!-- ══ LOADING INICIAL ══════════════════════════════════════ -->
+@if (isLoadingSession) {
+  <div class="pos-loading">
+    <mat-spinner diameter="64"></mat-spinner>
+    <p>Verificando sesión de caja...</p>
+  </div>
+} @else if (activeSession) {
+
+<!-- ══ LAYOUT PRINCIPAL DEL POS ════════════════════════════ -->
+<div class="pos-layout">
+
+  <!-- ════ PANEL IZQUIERDO: PRODUCTOS ══════════════════════ -->
+  <div class="products-panel">
+
+    <!-- Buscador grande touch-friendly -->
+    <div class="search-bar">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        class="search-input"
+        type="text"
+        [(ngModel)]="productSearch"
+        (ngModelChange)="filterProducts()"
+        placeholder="Buscar por nombre o clave..."
+        autocomplete="off">
+      @if (productSearch) {
+        <button class="search-clear" (click)="productSearch = ''; filterProducts()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    <!-- Grid de productos -->
+    @if (isLoadingProducts) {
+      <div class="products-loading">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    } @else if (filteredProducts.length === 0) {
+      <div class="no-products">
+        <mat-icon>inventory_2</mat-icon>
+        <p>{{ productSearch ? 'Sin resultados para "' + productSearch + '"' : 'No hay productos disponibles' }}</p>
+      </div>
+    } @else {
+      <div class="products-grid">
+        @for (product of filteredProducts; track trackByProductId($index, product)) {
+          <button class="product-card" (click)="addToCart(product)" [class.low-stock]="product.stock <= product.minimumStock">
+            <div class="product-card-code">{{ product.code | uppercase }}</div>
+            <div class="product-card-name">{{ product.name }}</div>
+            <div class="product-card-price">{{ product.price | currency:'MXN':'symbol':'1.2-2' }}</div>
+            <div class="product-card-stock" [class.low]="product.stock <= product.minimumStock">
+              <mat-icon>inventory</mat-icon> {{ product.stock }}
+            </div>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ════ PANEL DERECHO: CARRITO + COBRO ══════════════════ -->
+  <div class="cart-panel">
+
+    <!-- Título del carrito -->
+    <div class="cart-header">
+      <span class="cart-title">
+        <mat-icon>shopping_cart</mat-icon>
+        Carrito
+        @if (cart.length > 0) {
+          <span class="cart-badge">{{ cart.length }}</span>
+        }
+      </span>
+      @if (cart.length > 0) {
+        <button mat-icon-button class="clear-btn" (click)="clearCart()" matTooltip="Limpiar carrito">
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+      }
+    </div>
+
+    <!-- Items del carrito -->
+    <div class="cart-items">
+      @if (cart.length === 0) {
+        <div class="cart-empty">
+          <mat-icon>add_shopping_cart</mat-icon>
+          <p>Toca un producto para agregarlo</p>
+        </div>
+      } @else {
+        @for (item of cart; track trackByCartItem($index, item)) {
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <span class="cart-item-name">{{ item.product.name }}</span>
+              <span class="cart-item-code">{{ item.product.code | uppercase }}</span>
+            </div>
+
+            <!-- Controles de cantidad (botones grandes para touch) -->
+            <div class="cart-item-controls">
+              <button class="qty-btn" (click)="decreaseQty(item)">
+                <mat-icon>{{ item.quantity === 1 ? 'delete' : 'remove' }}</mat-icon>
+              </button>
+              <input class="qty-input" type="number"
+                [(ngModel)]="item.quantity"
+                (change)="onQtyChange(item)"
+                min="1" [max]="item.product.stock">
+              <button class="qty-btn" (click)="increaseQty(item)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+            <!-- Descuento y subtotal -->
+            <div class="cart-item-pricing">
+              <div class="discount-field">
+                <input class="discount-input" type="number"
+                  [(ngModel)]="item.discount"
+                  (change)="onDiscountChange(item)"
+                  min="0" max="100"
+                  placeholder="0">
+                <span class="discount-label">% desc.</span>
+              </div>
+              <span class="cart-item-subtotal">{{ item.subtotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+
+            <button class="remove-btn" (click)="removeFromCart(item)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- ── SECCIÓN DE COBRO ─────────────────────────────── -->
+    @if (cart.length > 0) {
+    <div class="checkout-section">
+
+      <!-- Cliente opcional -->
+      <div class="client-section">
+        <div class="client-search-wrapper">
+          <mat-icon class="client-icon">person</mat-icon>
+          <input class="client-input" type="text"
+            [(ngModel)]="clientSearch"
+            (ngModelChange)="filterClients()"
+            placeholder="Cliente (opcional)"
+            autocomplete="off">
+          @if (selectedClient) {
+            <button class="client-clear" (click)="clearClient()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+
+        <!-- Dropdown de clientes -->
+        @if (clientSearch && !selectedClient && filteredClients.length > 0) {
+          <div class="client-dropdown">
+            @for (c of filteredClients.slice(0, 5); track c.id) {
+              <button class="client-option" (click)="selectClient(c)">
+                <mat-icon>person</mat-icon> {{ c.name }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Toggle facturar -->
+        @if (selectedClient) {
+          <div class="billing-toggle">
+            <mat-slide-toggle [(ngModel)]="toBeBilled" color="primary">
+              Marcar para facturar
+            </mat-slide-toggle>
+          </div>
+        }
+      </div>
+
+      <!-- Métodos de pago (botones grandes touch) -->
+      <div class="payment-methods">
+        <p class="payment-label">Método de pago</p>
+        <div class="payment-btns">
+          @for (method of paymentMethods; track method) {
+            <button class="payment-method-btn"
+              [class.active]="payments | paymentActive: method"
+              (click)="togglePaymentMethod(method)">
+              <mat-icon>{{ getPaymentIcon(method) }}</mat-icon>
+              <span>{{ getPaymentLabel(method) }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Montos por método (cuando hay split payment) -->
+      @if (payments.length > 1) {
+        <div class="payment-amounts">
+          @for (payment of payments; track payment.paymentMethod) {
+            <div class="payment-amount-row">
+              <mat-icon>{{ getPaymentIcon(payment.paymentMethod) }}</mat-icon>
+              <span>{{ getPaymentLabel(payment.paymentMethod) }}</span>
+              <input class="amount-input" type="number"
+                [(ngModel)]="payment.amount"
+                (change)="onPaymentAmountChange(payment)"
+                min="0" step="0.01" placeholder="0.00">
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Campo efectivo recibido (cuando solo hay efectivo) -->
+      @if (payments.length === 1 && hasEfectivo) {
+        <div class="cash-received">
+          <label>Efectivo recibido</label>
+          <input class="cash-input" type="number"
+              [(ngModel)]="cashReceived"
+              min="0" step="0.01" placeholder="0.00">
+
+        @if (getChange() > 0) {
+          <div class="change-display">
+            Cambio: <strong>{{ getChange() | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+        }
+
+        <!-- ← Mensaje nuevo cuando el efectivo no alcanza -->
+        @if (cashReceived > 0 && cashReceived < cartTotal) {
+          <div class="cash-error">
+            <mat-icon>warning</mat-icon>
+            Faltan {{ (cartTotal - cashReceived) | currency:'MXN':'symbol':'1.2-2' }} para completar el pago
+          </div>
+        }
+        </div>
+      }
+
+      <!-- Resumen final -->
+      <div class="totals-section">
+        <div class="total-row">
+          <span>Subtotal</span>
+          <span>{{ cartTotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+        @if (payments.length > 0) {
+          <div class="total-row paid">
+            <span>Pagado</span>
+            <span>{{ paymentsTotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+        }
+        @if (pendingAmount > 0.01) {
+          <div class="total-row pending">
+            <span>Pendiente</span>
+            <span>{{ pendingAmount | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+        }
+        <div class="total-row grand">
+          <span>TOTAL</span>
+          <span>{{ cartTotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Botón COBRAR — el más importante de la pantalla -->
+      <button class="charge-btn"
+        [disabled]="!isReadyToCharge || isSaving"
+        (click)="charge()">
+        @if (isSaving) {
+          <mat-spinner diameter="28" color="accent"></mat-spinner>
+          <span>Procesando...</span>
+        } @else {
+          <mat-icon>point_of_sale</mat-icon>
+          <span>COBRAR {{ cartTotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+        }
+      </button>
+
+    </div>
+    }<!-- fin cart.length > 0 -->
+
+  </div><!-- fin cart-panel -->
+</div><!-- fin pos-layout -->
+
+}<!-- fin activeSession -->

@@ -116,6 +116,42 @@
         }
       </div>
 
+      <!-- POS (colapsable) -->
+      <div class="menu-group">
+        <div class="menu-group-header" (click)="toggleSection('pos')">
+          <mat-icon>groups</mat-icon>
+          <span>POS</span>
+          <mat-icon class="expand-icon" [class.rotated]="isSectionExpanded('pos')">
+            expand_more
+          </mat-icon>
+        </div>
+
+        @if (isSectionExpanded('pos')) {
+          <mat-nav-list class="submenu">
+            <a mat-list-item routerLink="/pos/cashier" routerLinkActive="active-link">
+              <mat-icon matListItemIcon>point_of_sale</mat-icon>
+              <span matListItemTitle>Caja</span>
+            </a>
+            <a mat-list-item routerLink="pos/sales" routerLinkActive="active-link">
+              <mat-icon matListItemIcon>receipt_long</mat-icon>
+              <span matListItemTitle>Ventas</span>
+            </a>
+            <a mat-list-item routerLink="pos/returns" routerLinkActive="active-link">
+              <mat-icon matListItemIcon>assignment_return</mat-icon>
+              <span matListItemTitle>Devoluciones</span>
+            </a>
+            <a mat-list-item routerLink="pos/cash-cut" routerLinkActive="active-link">
+              <mat-icon matListItemIcon>calculate</mat-icon>
+              <span matListItemTitle>Corte de caja</span>
+            </a>
+            <a mat-list-item routerLink="pos/billing" routerLinkActive="active-link">
+              <mat-icon matListItemIcon>receipt</mat-icon>
+              <span matListItemTitle>Facturación</span>
+            </a>
+          </mat-nav-list>
+        }
+      </div>
+
     </mat-nav-list>
 
     <!-- Footer del sidebar -->

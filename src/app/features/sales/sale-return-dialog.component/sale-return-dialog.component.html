@@ -1,0 +1,138 @@
+<!-- ============================================================ -->
+<!-- sale-return-dialog.component.html                          -->
+<!-- ============================================================ -->
+
+<h2 mat-dialog-title>
+  <mat-icon>assignment_return</mat-icon>
+  Registrar devolución
+  <span class="dialog-folio">{{ sale.folio }}</span>
+</h2>
+
+<mat-dialog-content>
+
+  <!-- ── Ítems a devolver ──────────────────────────────────── -->
+  <p class="section-label">Selecciona los productos a devolver</p>
+
+  <div class="items-list">
+    @for (state of itemStates; track state.saleItem.id) {
+      <div class="item-row" [class.selected]="state.selected"
+        [class.disabled]="state.availableToReturn <= 0"
+        (click)="toggleItem(state)">
+
+        <!-- Checkbox visual -->
+        <div class="item-check">
+          <mat-icon>{{ state.selected ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+        </div>
+
+        <!-- Info del producto -->
+        <div class="item-info">
+          <span class="item-code">{{ state.saleItem.productCode | uppercase }}</span>
+          <span class="item-name">{{ state.saleItem.productName }}</span>
+          <span class="item-meta">
+            Precio: {{ state.saleItem.unitPrice | currency:'MXN':'symbol':'1.2-2' }}
+            @if (state.saleItem.discount > 0) {
+              · Desc. {{ state.saleItem.discount }}%
+            }
+          </span>
+        </div>
+
+        <!-- Stock / disponible -->
+        <div class="item-stock">
+          <span class="stock-label">Vendido</span>
+          <span class="stock-value">{{ state.saleItem.quantity }}</span>
+          @if (state.alreadyReturned > 0) {
+            <span class="returned-label">Ya devuelto: {{ state.alreadyReturned }}</span>
+          }
+          <span class="available-label">Disponible: {{ state.availableToReturn }}</span>
+        </div>
+
+        <!-- Cantidad a devolver (solo cuando está seleccionado) -->
+        @if (state.selected) {
+          <div class="item-qty" (click)="$event.stopPropagation()">
+            <label>Cantidad</label>
+            <div class="qty-controls">
+              <button class="qty-btn" type="button"
+                (click)="state.quantityToReturn = +(state.quantityToReturn - 1).toFixed(3); onQuantityChange(state)"
+                [disabled]="state.quantityToReturn <= 0.001">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <input class="qty-input" type="number"
+                [(ngModel)]="state.quantityToReturn"
+                (change)="onQuantityChange(state)"
+                min="0.001" [max]="state.availableToReturn" step="1">
+              <button class="qty-btn" type="button"
+                (click)="state.quantityToReturn = +(state.quantityToReturn + 1).toFixed(3); onQuantityChange(state)"
+                [disabled]="state.quantityToReturn >= state.availableToReturn">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Reembolso calculado -->
+        @if (state.selected) {
+          <div class="item-refund">
+            <span class="refund-label">Reembolso</span>
+            <span class="refund-amount">{{ state.refundAmount | currency:'MXN':'symbol':'1.2-2' }}</span>
+          </div>
+        }
+
+        <!-- Badge de "sin disponible" -->
+        @if (state.availableToReturn <= 0) {
+          <span class="no-stock-badge">Ya devuelto</span>
+        }
+
+      </div>
+    }
+  </div>
+
+  <!-- ── Método de reembolso ───────────────────────────────── -->
+  <p class="section-label">¿Cómo se regresa el dinero?</p>
+  <div class="refund-methods">
+    @for (method of paymentMethods; track method.value) {
+      <button type="button" class="refund-method-btn"
+        [class.active]="refundMethod === method.value"
+        (click)="refundMethod = method.value">
+        <mat-icon>{{ method.icon }}</mat-icon>
+        <span>{{ method.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- ── Motivo ─────────────────────────────────────────────── -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Motivo de la devolución</mat-label>
+    <input matInput [(ngModel)]="reason"
+      placeholder="Ej: Producto defectuoso, cliente cambió de opinión...">
+    <mat-icon matPrefix>notes</mat-icon>
+  </mat-form-field>
+
+  <!-- ── Resumen ────────────────────────────────────────────── -->
+  @if (selectedItems.length > 0) {
+    <div class="return-summary">
+      <div class="summary-row">
+        <span>Productos a devolver</span>
+        <strong>{{ selectedItems.length }}</strong>
+      </div>
+      <div class="summary-row total">
+        <span>Total a reembolsar</span>
+        <strong>{{ totalRefund | currency:'MXN':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="isSaving">Cancelar</button>
+  <button mat-raised-button color="primary"
+    [disabled]="!canSave"
+    (click)="save()">
+    @if (isSaving) {
+      <mat-icon class="spin">refresh</mat-icon> Guardando...
+    } @else {
+      <mat-icon>assignment_return</mat-icon>
+      Registrar devolución
+    }
+  </button>
+</mat-dialog-actions>

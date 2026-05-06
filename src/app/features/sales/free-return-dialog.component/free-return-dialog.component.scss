@@ -1,0 +1,126 @@
+/* ============================================================ */
+/* free-return-dialog.component.scss                           */
+/* ============================================================ */
+
+h2[mat-dialog-title] {
+  display: flex; align-items: center; gap: 8px;
+  color: #880e4f;
+  mat-icon { color: #e65100; }
+}
+
+mat-dialog-content { padding-top: 4px !important; }
+
+.info-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fff8e1; border: 1px solid #ffcc02; border-radius: 8px;
+  padding: 10px 14px; margin-bottom: 16px;
+  mat-icon { color: #f9a825; flex-shrink: 0; font-size: 20px; }
+  p { margin: 0; font-size: 0.85rem; color: #555; line-height: 1.4; }
+}
+
+.section-label {
+  font-size: 0.78rem; font-weight: 600; color: #880e4f;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 12px 0 8px; display: flex; align-items: center; gap: 8px;
+}
+
+.optional-label { margin-top: 16px; }
+
+.optional-tag {
+  background: #f5f5f5; color: #888; font-size: 0.72rem;
+  padding: 1px 8px; border-radius: 8px; text-transform: none;
+  font-weight: 400; letter-spacing: 0;
+}
+
+.section-hint { font-size: 0.8rem; color: #888; margin: -4px 0 8px; }
+
+.full { width: 100%; }
+
+// Métodos de reembolso
+.refund-methods {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;
+}
+
+.refund-method-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  height: 64px; border-radius: 10px; border: 2px solid #e0e0e0;
+  background: white; cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; color: #666; transition: all 0.15s;
+  mat-icon { font-size: 22px; }
+  &:hover { border-color: #e65100; color: #e65100; background: #fff3e0; }
+  &.active { border-color: #e65100; background: #e65100; color: white; }
+}
+
+mat-divider { margin: 16px 0 4px; }
+
+// Buscador de producto
+.product-search-wrapper {
+  display: flex; align-items: center; gap: 8px;
+  background: #f9f9f9; border: 1.5px solid #e0e0e0;
+  border-radius: 10px; padding: 8px 12px; height: 44px;
+  position: relative;
+
+  .search-icon { color: #e91e63; font-size: 20px; }
+  .product-input {
+    flex: 1; border: none; outline: none; font-size: 0.9rem; background: transparent;
+    &::placeholder { color: #aaa; }
+  }
+  .clear-btn {
+    background: none; border: none; cursor: pointer; color: #aaa;
+    mat-icon { font-size: 18px; }
+  }
+}
+
+.product-dropdown {
+  background: white; border: 1.5px solid #e0e0e0; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1); overflow: hidden;
+  margin-top: 4px;
+
+  .product-option {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 14px; border: none; background: none;
+    cursor: pointer; text-align: left;
+    &:hover { background: #fff5f8; }
+
+    .opt-code { font-family: monospace; font-size: 0.78rem; color: #e91e63; font-weight: 700; flex-shrink: 0; }
+    .opt-name { flex: 1; font-size: 0.88rem; color: #333; }
+    .opt-stock { font-size: 0.75rem; color: #888; flex-shrink: 0; }
+  }
+}
+
+.qty-restore {
+  display: flex; align-items: center; gap: 10px;
+  background: #e8f5e9; border-radius: 8px; padding: 10px 14px;
+  margin-top: 8px;
+  mat-icon { color: #2e7d32; font-size: 20px; }
+  span { flex: 1; font-size: 0.88rem; color: #2e7d32; font-weight: 500; }
+  .qty-input {
+    width: 70px; height: 36px; text-align: center;
+    border: 2px solid #a5d6a7; border-radius: 8px;
+    font-size: 1rem; font-weight: 700; color: #2e7d32; outline: none;
+    &:focus { border-color: #2e7d32; }
+    &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; }
+  }
+}
+
+.qty-hint { font-size: 0.78rem; color: #888; margin: 4px 0 0 44px; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+
+
+/* ============================================================ */
+/* AGREGAR en app_routes.ts                                    */
+/* ============================================================ */
+/*
+  // Historial de devoluciones
+  {
+    path: 'pos/returns',
+    loadComponent: () =>
+      import('./features/pos/return-list/return-list.component')
+        .then(m => m.ReturnListComponent),
+    canActivate: [authGuard],
+    data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+  },
+*/
