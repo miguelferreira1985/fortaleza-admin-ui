@@ -1,0 +1,211 @@
+<!-- sale-detail.component.html -->
+
+<!-- Header -->
+<div class="form-page-header">
+  <div class="header-left">
+    <button mat-icon-button (click)="goBack()" class="back-btn" matTooltip="Volver al historial">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1>Detalle de Venta</h1>
+      @if (sale) {
+        <span class="header-subtitle">{{ sale.folio }}</span>
+      }
+    </div>
+  </div>
+
+  @if (sale) {
+    <div class="header-actions">
+      <!-- Imprimir ticket -->
+      <button mat-stroked-button (click)="openReceipt()" class="action-btn print-btn">
+        <mat-icon>print</mat-icon>
+        <span>Imprimir ticket</span>
+      </button>
+
+      <!-- Devolver -->
+      @if (canReturn) {
+        <button mat-stroked-button (click)="openReturnDialog()" class="action-btn return-btn"
+          *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+          <mat-icon>assignment_return</mat-icon>
+          <span>Devolución</span>
+        </button>
+      }
+
+      <!-- Cancelar -->
+      @if (canCancel) {
+        <button mat-stroked-button (click)="cancelSale()" class="action-btn cancel-btn"
+          [disabled]="isCancelling" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+          <mat-icon>cancel</mat-icon>
+          <span>Cancelar venta</span>
+        </button>
+      }
+    </div>
+  }
+</div>
+
+@if (isLoading) {
+  <div class="page-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando venta...</p>
+  </div>
+} @else if (sale) {
+
+<div class="detail-layout">
+
+  <!-- ═══ COLUMNA IZQUIERDA ════════════════════════════════ -->
+  <div class="left-col">
+
+    <!-- Información general -->
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Información general
+        </mat-card-title>
+        <span class="status-chip" [ngClass]="statusConfig?.cssClass">
+          <mat-icon>{{ statusConfig?.icon }}</mat-icon>
+          {{ statusConfig?.label }}
+        </span>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Folio</span>
+            <span class="info-value folio">{{ sale.folio }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Fecha y hora</span>
+            <span class="info-value">{{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Cajero</span>
+            <span class="info-value">{{ sale.employeeName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Cliente</span>
+            <span class="info-value">
+              {{ sale.clientName ?? 'Público general' }}
+              @if (sale.toBeBilled) {
+                <mat-icon class="bill-icon" matTooltip="Marcada para facturar">receipt</mat-icon>
+              }
+            </span>
+          </div>
+          @if (sale.cancelReason) {
+            <div class="info-item full-width">
+              <span class="info-label">Motivo de cancelación</span>
+              <span class="info-value cancel-reason">{{ sale.cancelReason }}</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Pagos -->
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>payments</mat-icon>
+          Pagos
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="payments-list">
+          @for (payment of sale.payments; track payment.id) {
+            <div class="payment-row">
+              <div class="payment-method">
+                <mat-icon>{{ getPaymentIcon(payment.paymentMethod) }}</mat-icon>
+                <span>{{ getPaymentLabel(payment.paymentMethod) }}</span>
+              </div>
+              <span class="payment-amount">{{ payment.amount | currency:'MXN':'symbol':'1.2-2' }}</span>
+            </div>
+          }
+          <div class="total-row">
+            <span>TOTAL</span>
+            <strong>{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Devoluciones previas -->
+    @if (returns.length > 0) {
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>assignment_return</mat-icon>
+            Devoluciones ({{ returns.length }})
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @for (ret of returns; track ret.id) {
+            <div class="return-item">
+              <div class="return-header">
+                <span class="return-folio">{{ ret.folio }}</span>
+                <span class="return-type" [class.total]="ret.returnType === 'TOTAL'">
+                  {{ ret.returnType === 'TOTAL' ? 'Total' : 'Parcial' }}
+                </span>
+                <span class="return-date">{{ ret.returnDate | date:'dd/MM/yy HH:mm' }}</span>
+
+                <button
+                    mat-icon-button
+                    (click)="openReturnReceipt(ret)"
+                    matTooltip="Imprimir ticket de devolución"
+                    class="print-return-btn">
+                  <mat-icon>print</mat-icon>
+                </button>
+
+              </div>
+              <div class="return-info">
+                <span>Reembolso: <strong>{{ ret.totalRefuned | currency:'MXN':'symbol':'1.2-2' }}</strong></span>
+                <span>Método: {{ getPaymentLabel(ret.refundMethod) }}</span>
+                <span>Por: {{ ret.employeeName }}</span>
+              </div>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+
+  </div>
+
+  <!-- ═══ COLUMNA DERECHA: ÍTEMS ═══════════════════════════ -->
+  <div class="right-col">
+    <mat-card class="detail-card items-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_bag</mat-icon>
+          Productos ({{ sale.items.length }})
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="items-list">
+          @for (item of sale.items; track item.id) {
+            <div class="item-row">
+              <div class="item-info">
+                <span class="item-code">{{ item.productCode | uppercase }}</span>
+                <span class="item-name">{{ item.productName }}</span>
+              </div>
+              <div class="item-pricing">
+                <span class="item-qty-price">
+                  {{ item.quantity }} × {{ item.unitPrice | currency:'MXN':'symbol':'1.2-2' }}
+                </span>
+                @if (item.discount > 0) {
+                  <span class="item-discount">- {{ item.discount }}%</span>
+                }
+                <span class="item-subtotal">{{ item.subtotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="items-total">
+          <span>Total</span>
+          <strong>{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>
+
+}<!-- fin sale -->

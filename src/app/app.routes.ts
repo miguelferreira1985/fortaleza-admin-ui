@@ -123,6 +123,47 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/purchase-orders/purchase-order-edit.component/purchase-order-edit.component').then(m => m.PurchaseOrderEditComponent),
         canActivate: [authGuard]
+      },
+      {
+        path: 'pos/cashier',
+        loadComponent: () =>
+          import('./features/pos/pos-screen.component').then(m => m.PosScreenComponent),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'pos/sales',
+        loadComponent: () =>
+          import('./features/sales/sale-list.component/sale-list.component').then(m => m.SaleListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/sales/:id',
+        loadComponent: () =>
+          import('./features/sales/sale-detail.component/sale-detail.component').then(m => m.SaleDetailComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/returns',
+        loadComponent: () =>
+          import('./features/sales/sale-return-list.component/sale-return-list.component').then(m => m.SaleReturnListComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/billing',
+        loadComponent: () =>
+          import('./features/pos/billing-dashboard.component/billing-dashboard.component').then(m => m.BillingDashboardComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
+      },
+      {
+        path: 'pos/cash-cut',
+        loadComponent: () =>
+          import('./features/pos/cash-cut.component/cash-cut.component').then(m => m.CashCutComponent),
+        canActivate: [authGuard],
+        data: { roles: ['ROLE_ADMIN', 'ROLE_MANAGER'] }
       }
     ]
   }
