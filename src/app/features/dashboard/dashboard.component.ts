@@ -10,6 +10,7 @@ import { CategoryService } from '../../core/services/category.service';
 import { SupplierService } from '../../core/services/supplier.service';
 import { ClientService } from '../../core/services/client.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard.component',
@@ -30,6 +31,7 @@ export class DashboardComponent {
   private supplierService = inject(SupplierService);
   private clientService = inject(ClientService);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   pendingOrders: number = 0;
   categoriesCount: number = 0;
@@ -48,13 +50,15 @@ export class DashboardComponent {
 
   loadDashboardData(): void {
 
-    this.productService.getInventoryValue().subscribe({
-      next: (res) => {
-        this.inventoryValue = res.data;
-        console.log(this.inventoryValue)
-      },
-      error: (err) => console.error('Error cargando inventory value:', err)
-    });
+    if (this.authService.hasRole('ROLE_ADMIN')) {
+      this.productService.getInventoryValue().subscribe({
+        next: (res) => {
+          this.inventoryValue = res.data;
+          console.log(this.inventoryValue)
+        },
+        error: (err) => console.error('Error cargando inventory value:', err)
+      });
+    }
 
     this.productService.getLowStock().subscribe(data => {
       this.lowStockProducts = data;
@@ -68,12 +72,15 @@ export class DashboardComponent {
       error: (err) => console.error('Error cargando inventory value:', err)
     });
 
-    this.purchaseOrderService.countByStatus('PENDIENTE').subscribe({
-      next: (res) => {
-        this.pendingOrders = res.data;
-      },
-      error: (err) => console.error('Error cargando inventory value:', err)
-    });
+    if (this.authService.hasAnyRole(['ROLE_ADMIN', 'ROLE_MANAGER'])) {
+      this.purchaseOrderService.countByStatus('PENDIENTE').subscribe({
+        next: (res) => {
+          this.pendingOrders = res.data;
+        },
+        error: (err) => console.error('Error cargando inventory value:', err)
+      });
+    }
+
 
     this.categoryService.countCategories().subscribe({
       next: (res) => {

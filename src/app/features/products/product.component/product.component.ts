@@ -52,7 +52,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
   selectedSupplierId: number | null = null;
 
   displayedColumns: string[] = [
-    'code', 'name', 'stock', 'price', 'cost',
+    'code', 'name', 'stock', 'cost', 'price',
     'presentation', 'category', 'actions'
   ];
 

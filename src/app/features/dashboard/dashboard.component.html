@@ -52,7 +52,7 @@
     </mat-card>
 
     <!-- 👇 NUEVO: Órdenes pendientes -->
-    <mat-card class="stat-card stat-info">
+    <mat-card class="stat-card stat-info" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
       <mat-card-content>
         <div class="stat-icon">
           <mat-icon>receipt_long</mat-icon>
@@ -129,7 +129,7 @@
     </mat-card>
 
     <!-- COLUMNA DERECHA: Accesos rápidos + Actividad -->
-    <div class="right-column">
+    <div class="right-column" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
 
       <!-- Accesos rápidos -->
       <mat-card class="quick-actions-card">
@@ -157,7 +157,7 @@
               Proveedores
             </button>
 
-            <button mat-stroked-button (click)="goToInventoryMovements()" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+            <button mat-stroked-button (click)="goToInventoryMovements()" *hasRole="['ROLE_ADMIN']">
               <mat-icon>swap_horiz</mat-icon>
               Movimientos
             </button>
