@@ -52,8 +52,8 @@ export class BillingListComponent implements OnInit {
   openClientDetail(client: BillingClientSummary): void {
     this.router.navigate(['/pos/billing/client', client.clientId], {
       queryParams: {
-        from: this.dateFrom,
-        to: this.dateTo,
+        from: this.formatDate(this.dateFrom),
+        to: this.formatDate(this.dateTo),
         clientName: client.clientName,
         clientRfc: client.clientRfc
       }

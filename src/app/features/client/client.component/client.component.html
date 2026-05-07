@@ -90,14 +90,18 @@
             </button>
             @if (c.isActivate) {
               <button mat-icon-button color="warn"
-                (click)="deactivateClient(c)" matTooltip="Desactivar cliente">
+                (click)="deactivateClient(c)"
+                matTooltip="Desactivar cliente"
+                *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
                 <mat-icon>person_off</mat-icon>
               </button>
             }
 
             @if (!c.isActivate) {
               <button mat-icon-button color="warn"
-                (click)="activateClient(c)" matTooltip="Activar cliente">
+                (click)="activateClient(c)"
+                matTooltip="Activar cliente"
+                *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
                 <mat-icon>how_to_reg</mat-icon>
               </button>
             }

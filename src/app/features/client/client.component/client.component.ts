@@ -10,13 +10,15 @@ import { Client } from '../../../shared/models/client';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ClientDialogComponent } from '../client-dialog.component/client-dialog.component';
+import { HasRoleDirective } from '../../../core/directives/has-role.directive';
 
 @Component({
   selector: 'app-client.component',
   imports: [
     CommonModule,
     MaterialModule,
-    FormsModule
+    FormsModule,
+    HasRoleDirective
   ],
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss',

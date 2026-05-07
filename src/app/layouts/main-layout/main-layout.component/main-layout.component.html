@@ -42,19 +42,22 @@
               <span matListItemTitle>Productos</span>
             </a>
             <a mat-list-item routerLink="/inventory-movement" routerLinkActive="active-link"
-              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
+              *hasRole="['ROLE_ADMIN']">
               <mat-icon matListItemIcon>swap_horiz</mat-icon>
               <span matListItemTitle>Movimientos de Stock</span>
             </a>
-            <a mat-list-item routerLink="/presentation" routerLinkActive="active-link">
+            <a mat-list-item routerLink="/presentation" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>straighten</mat-icon>
               <span matListItemTitle>Presentaciones</span>
             </a>
-            <a mat-list-item routerLink="/category" routerLinkActive="active-link">
+            <a mat-list-item routerLink="/category" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>layers</mat-icon>
               <span matListItemTitle>Categorías</span>
             </a>
-            <a mat-list-item routerLink="/subcategory" routerLinkActive="active-link">
+            <a mat-list-item routerLink="/subcategory" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>list</mat-icon>
               <span matListItemTitle>Subcategorías</span>
             </a>
@@ -63,7 +66,7 @@
       </div>
 
       <!-- Compras (colapsable) -->
-      <div class="menu-group">
+      <div class="menu-group" *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
         <div class="menu-group-header" (click)="toggleSection('compras')">
           <mat-icon>shopping_cart</mat-icon>
           <span>Compras</span>
@@ -74,7 +77,8 @@
 
         @if (isSectionExpanded('compras')) {
           <mat-nav-list class="submenu">
-            <a mat-list-item routerLink="/purchase-orders" routerLinkActive="active-link">
+            <a mat-list-item routerLink="/purchase-orders" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>receipt_long</mat-icon>
               <span matListItemTitle>Órdenes de Compra</span>
             </a>
@@ -104,7 +108,8 @@
               <mat-icon matListItemIcon>manage_accounts</mat-icon>
               <span matListItemTitle>Usuarios</span>
             </a>
-            <a mat-list-item routerLink="/supplier" routerLinkActive="active-link">
+            <a mat-list-item routerLink="/supplier" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>local_shipping</mat-icon>
               <span matListItemTitle>Proveedores</span>
             </a>
@@ -132,19 +137,23 @@
               <mat-icon matListItemIcon>point_of_sale</mat-icon>
               <span matListItemTitle>Caja</span>
             </a>
-            <a mat-list-item routerLink="pos/sales" routerLinkActive="active-link">
+            <a mat-list-item routerLink="pos/sales" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>receipt_long</mat-icon>
               <span matListItemTitle>Ventas</span>
             </a>
-            <a mat-list-item routerLink="pos/returns" routerLinkActive="active-link">
+            <a mat-list-item routerLink="pos/returns" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>assignment_return</mat-icon>
               <span matListItemTitle>Devoluciones</span>
             </a>
-            <a mat-list-item routerLink="pos/cash-cut" routerLinkActive="active-link">
+            <a mat-list-item routerLink="pos/cash-cut" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN']">
               <mat-icon matListItemIcon>calculate</mat-icon>
               <span matListItemTitle>Corte de caja</span>
             </a>
-            <a mat-list-item routerLink="pos/billing" routerLinkActive="active-link">
+            <a mat-list-item routerLink="pos/billing" routerLinkActive="active-link"
+              *hasRole="['ROLE_ADMIN', 'ROLE_MANAGER']">
               <mat-icon matListItemIcon>receipt</mat-icon>
               <span matListItemTitle>Facturación</span>
             </a>

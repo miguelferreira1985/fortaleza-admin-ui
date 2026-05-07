@@ -19,7 +19,7 @@ import { BillingClientDetail } from '../../../shared/models/sale.models';
 })
 export class BillingClientDetailComponent implements OnInit {
 
-    private saleService = inject(SaleService);
+  private saleService = inject(SaleService);
   private notify = inject(NotificationService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
