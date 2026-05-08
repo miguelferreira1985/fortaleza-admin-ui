@@ -14,6 +14,7 @@ import {
   PaymentMethod,
   SaleReturnResponse
 } from '../../../shared/models/sale.models';
+import { SaleReturnReceiptDialogComponent } from '../sale-return-receipt-dialog.component/sale-return-receipt-dialog.component';
 
 interface ReturnItemState {
   saleItem: SaleItemResponse;
@@ -135,6 +136,7 @@ export class SaleReturnDialogComponent implements OnInit {
   // ── Guardar ───────────────────────────────────────────────
 
   save(): void {
+    alert('Entrando  save');
     if (!this.canSave) return;
 
     const request: SaleReturnRequest = {
@@ -150,13 +152,17 @@ export class SaleReturnDialogComponent implements OnInit {
     this.saleService.createReturn(this.sale.id, request).subscribe({
       next: (res) => {
         const saleReturn: SaleReturnResponse = res.data;
+        console.log('SaleReturn data:', saleReturn);
+        console.log('Items:', saleReturn.items);
         this.isSaving = false;
         this.notify.success('¡Devolución registrada!', `Reembolso: $${this.totalRefund.toFixed(2)}`);
-        this.dialogRef.close(true);
-        this.dialog.open(SaleReturnDialogComponent, {
-          width: '420px',
-          data: { saleReturn },
-          panelClass: 'receipt-dialog'
+        this.dialogRef.close(saleReturn);
+        this.dialogRef.afterClosed().subscribe(() => { // 🔍 DEBUG
+          this.dialog.open(SaleReturnDialogComponent, {
+            width: '420px',
+            data: { saleReturn },
+            panelClass: 'receipt-dialog'
+          });
         });
       },
       error: (err) => {

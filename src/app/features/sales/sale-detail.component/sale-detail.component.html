@@ -156,7 +156,7 @@
 
               </div>
               <div class="return-info">
-                <span>Reembolso: <strong>{{ ret.totalRefuned | currency:'MXN':'symbol':'1.2-2' }}</strong></span>
+                <span>Reembolso: <strong>{{ ret.totalRefunded | currency:'MXN':'symbol':'1.2-2' }}</strong></span>
                 <span>Método: {{ getPaymentLabel(ret.refundMethod) }}</span>
                 <span>Por: {{ ret.employeeName }}</span>
               </div>

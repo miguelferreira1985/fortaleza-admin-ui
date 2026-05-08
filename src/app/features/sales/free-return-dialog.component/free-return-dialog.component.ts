@@ -8,7 +8,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Product } from '../../../shared/models/product';
-import { PaymentMethod, FreeReturnRequest } from '../../../shared/models/sale.models';
+import { PaymentMethod, FreeReturnRequest, SaleReturnResponse } from '../../../shared/models/sale.models';
 import { SaleReturnReceiptDialogComponent } from '../sale-return-receipt-dialog.component/sale-return-receipt-dialog.component';
 
 @Component({
@@ -107,14 +107,17 @@ export class FreeReturnDialogComponent implements OnInit {
 
     this.isSaving = true;
     this.saleService.createFreeReturn(request).subscribe({
-      next: (saleReturn) => {
+      next: (res) => {
+        const saleReturn: SaleReturnResponse = res.data;
         this.isSaving = false;
         this.notify.success('¡Devolución registrada!', `Reembolso: $${this.amount.toFixed(2)}`);
-        this.dialogRef.close(true);
-        this.dialog.open(SaleReturnReceiptDialogComponent, {
-          width: '420px',
-          data: { saleReturn },
-          panelClass: 'receipt-dialog'
+        this.dialogRef.close(saleReturn);
+        this.dialogRef.afterClosed().subscribe(() => {
+          this.dialog.open(SaleReturnReceiptDialogComponent, {
+            width: '420px',
+            data: { saleReturn },
+            panelClass: 'receipt-dialog'
+          });
         });
       },
       error: (err) => {

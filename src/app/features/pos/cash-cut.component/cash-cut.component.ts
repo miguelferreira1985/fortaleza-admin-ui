@@ -29,9 +29,9 @@ export class CashCutComponent implements OnInit {
 
   cutMode: CutMode = 'DAY';
 
-  selectedDate = this.toDateString(new Date());
-  dateFrom = this.toDateString(new Date());
-  dateTo = this.toDateString(new Date());
+  selectedDate: Date = new Date();
+  dateFrom: Date = new Date();
+  dateTo: Date = new Date();
   selectedSessionId: number | null = null;
   selectedEmployeeId: number | null = null;
 
@@ -70,7 +70,7 @@ export class CashCutComponent implements OnInit {
 
     switch(this.cutMode) {
       case 'DAY':
-        obs$ = this.cashService.getCutByDay(this.selectedDate);
+        obs$ = this.cashService.getCutByDay(this.toDateString(this.selectedDate));
         break;
       case 'SESSION':
         if (!this.selectedSessionId) {
@@ -84,7 +84,7 @@ export class CashCutComponent implements OnInit {
           this.notify.warning('Seleccione un empleado', '');
           this.isLoading = false;
         }
-        obs$ = this.cashService.getCutByEmployee(this.selectedEmployeeId!, this.dateFrom, this.dateTo);
+        obs$ = this.cashService.getCutByEmployee(this.selectedEmployeeId!, this.toDateString(this.dateFrom), this.toDateString(this.dateTo));
         break;
     }
 
@@ -133,7 +133,10 @@ export class CashCutComponent implements OnInit {
   }
 
   private toDateString(date: Date): string {
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
 }
