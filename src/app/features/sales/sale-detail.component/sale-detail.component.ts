@@ -144,6 +144,35 @@ export class SaleDetailComponent implements OnInit {
     return this.sale.status === 'COMPLETADA' || this.sale.status === 'DEVUELTA_PARCIAL';
   }
 
+    get hasEfectivo(): boolean {
+    return this.sale?.payments.some(p => p.paymentMethod === 'EFECTIVO') ?? false;
+  }
+
+  get cashReceived(): number {
+    if (!this.sale) return 0;
+    const cashPayment = this.sale.payments.find(p => p.paymentMethod === 'EFECTIVO');
+    if (!cashPayment) return 0;
+
+    return (cashPayment.cashReceived != null && cashPayment.cashReceived > 0)
+      ? cashPayment.cashReceived
+      : cashPayment.amount;
+  }
+
+  get calculatedChange(): number {
+    if (!this.sale || !this.hasEfectivo) return 0;
+
+    const cashPayment = this.sale.payments
+      .filter(p => p.paymentMethod === 'EFECTIVO')
+      .reduce((a, p) => a + p.amount, 0);
+
+    const otherPayments = this.sale.payments
+      .filter(p => p.paymentMethod !== 'EFECTIVO')
+      .reduce((a, p) => a + p.amount, 0);
+
+    const cashNeeded = this.sale.total - otherPayments;
+    return Math.max(0, this.cashReceived - cashNeeded);
+  }
+
   getPaymentLabel(method: string): string {
     const labels: Record<string, string> = {
       EFECTIVO: 'Efectivo', TARJETA: 'Tarjeta', TRANSFERENCIA: 'Transferencia'

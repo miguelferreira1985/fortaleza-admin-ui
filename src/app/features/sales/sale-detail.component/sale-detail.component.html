@@ -119,6 +119,28 @@
               <span class="payment-amount">{{ payment.amount | currency:'MXN':'symbol':'1.2-2' }}</span>
             </div>
           }
+
+          @if (hasEfectivo && cashReceived > 0) {
+            <div class="cash-details">
+              <div class="cash-detail-row cash-received-row">
+                <span class="cash-label">
+                  <mat-icon>receipt_long</mat-icon>
+                  Efectivo recibido
+                </span>
+                <span class="cash-value">{{ cashReceived | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            @if (calculatedChange > 0) {
+              <div class="cash-detail-row change-row">
+                <span class="cash-label">
+                  <mat-icon>sync_alt</mat-icon>
+                  Cambio entregado
+                </span>
+                <span class="cash-value">{{ calculatedChange | currency:'MXN':'symbol':'1.2-2' }}</span>
+              </div>
+            }
+            </div>
+          }
+
           <div class="total-row">
             <span>TOTAL</span>
             <strong>{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</strong>

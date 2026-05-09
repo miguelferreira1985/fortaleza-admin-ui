@@ -17,6 +17,7 @@ export interface SalePaymentResponse {
   id: number;
   paymentMethod: PaymentMethod;
   amount: number;
+  cashReceived?: number;
 }
 
 export interface SaleResponse {
@@ -47,6 +48,7 @@ export interface SaleItemRequest {
 export interface SalePaymentRequest {
   paymentMethod: PaymentMethod;
   amount: number;
+  cashReceived?: number;
 }
 
 export interface SaleRequest {

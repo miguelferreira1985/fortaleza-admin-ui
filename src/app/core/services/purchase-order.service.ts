@@ -42,4 +42,12 @@ export class PurchaseOrderService {
     return this.http.get<ApiResponse<number>>(`${this.baseUrl}/count?status=${status}`);
   }
 
+  downloadPurchaseOrderPdf(orderId: number, templateName: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${orderId}/pdf/${templateName}`,
+      {
+        responseType: 'blob'
+      }
+    );
+  }
+
 }

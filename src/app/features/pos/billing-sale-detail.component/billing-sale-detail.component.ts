@@ -35,16 +35,37 @@ export class BillingSaleDetailComponent implements OnInit {
   items: BillingItemDetail[] = [];
   isLoading = false;
 
+  private readonly IVA_RATE = 0.16;
+
   get isAccumulated(): boolean {
     return this.saleId === null;
   }
 
+  get subtotalWithoutTaxes(): number {
+    return this.items.reduce((sum, item) => {
+      const subtotalWithoutTaxes = item.subtotal / (1 + this.IVA_RATE);
+      return sum + subtotalWithoutTaxes;
+    }, 0);
+  }
+
+  get taxes(): number {
+    return this.subtotalWithoutTaxes * this.IVA_RATE;
+  }
+
   get total(): number {
-    return this.items.reduce((sum, item) => sum + item.subtotal, 0);
+    return this.subtotalWithoutTaxes + this.taxes;
   }
 
   get totalProducts(): number {
     return this.items.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  getPriceWithoutTaxes(unitPrice: number): number {
+    return unitPrice / (1 + this.IVA_RATE);
+  }
+
+  getSubtotalWihtoutTaxes(subtotal: number): number {
+    return subtotal / (1 + this.IVA_RATE);
   }
 
   ngOnInit(): void {

@@ -35,8 +35,12 @@
           <mat-icon>cancel</mat-icon> Cancelar
         </button>
       }
-      <button mat-stroked-button (click)="printPdf()">
-        <mat-icon>print</mat-icon> Imprimir
+      <button mat-stroked-button (click)="printInternalOrder('purchase-order-internal-pdf')">
+        <mat-icon>print</mat-icon> Imprimir Orden Interna
+      </button>
+
+      <button mat-stroked-button (click)="printInternalOrder('purchase-order-external-pdf')">
+        <mat-icon>print</mat-icon> Imprimir Orden Proveedor
       </button>
     </div>
   }

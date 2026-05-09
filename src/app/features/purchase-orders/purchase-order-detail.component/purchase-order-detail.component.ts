@@ -7,6 +7,7 @@ import { NotificationService } from '../../../core/services/notification.service
 import { getStatusConfig } from '../../../core/utils/purchase-order-status.util';
 import { PurchaseOrderStatus } from '../../../shared/models/purchase-order-status.enum';
 import { PurchaseOrderStatusUpdateRequestDTO } from '../../../shared/models/purchase-order.models';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-purchase-order-detail.component',
@@ -26,11 +27,16 @@ export class PurchaseOrderDetailComponent implements OnInit {
   private location = inject(Location);
   private purchaseOrderService = inject(PurchaseOrderService);
   private notify = inject(NotificationService);
+   private dialog = inject(MatDialog);
 
   orderId!: number;
   order: any = null;
   isLoading = false;
+  isLoadingPdf = false;
   errorMessage = '';
+
+  intertalPdfTemplateName = 'purchase-order-internal-pdf';
+  externalPdfTemplateName = 'purchase-order-external-pdf';
 
   readonly getStatusConfig = getStatusConfig;
   readonly statusEnum = PurchaseOrderStatus;
@@ -95,25 +101,28 @@ export class PurchaseOrderDetailComponent implements OnInit {
     });
   }
 
-  printPdf(): void {
-      // Oculta el sidebar antes de imprimir
-  const sidebar = document.querySelector('mat-sidenav');
-  const header = document.querySelector('.form-page-header');
-  const infoCard = document.querySelector('.info-card');
+  printInternalOrder(templateName: string): void {
 
-  if (sidebar) (sidebar as HTMLElement).style.display = 'none';
-  if (header) (header as HTMLElement).style.display = 'none';
-  if (infoCard) (infoCard as HTMLElement).style.display = 'none';
+    this.isLoadingPdf = true;
 
-  // Imprime
-  window.print();
+    this.purchaseOrderService.downloadPurchaseOrderPdf(this.order.id, templateName).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const windowRef = window.open(url, '_blank');
 
-  // Restaura después de imprimir
-  setTimeout(() => {
-    if (sidebar) (sidebar as HTMLElement).style.display = '';
-    if (header) (header as HTMLElement).style.display = '';
-    if (infoCard) (infoCard as HTMLElement).style.display = '';
-  }, 1000);
+        if (windowRef) {
+          windowRef.onload = () => {
+            window.URL.revokeObjectURL(url);
+          };
+        }
+
+        this.isLoadingPdf = false;
+      },
+      error: (err) => {
+        this.isLoadingPdf = false;
+        this.notify.error('Error', 'No se pudo generar el PDF');
+      }
+    });
   }
 
   goBack(): void   { this.router.navigate(['/purchase-orders'])}
