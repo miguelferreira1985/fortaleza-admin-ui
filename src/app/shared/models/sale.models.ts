@@ -17,6 +17,7 @@ export interface SalePaymentResponse {
   id: number;
   paymentMethod: PaymentMethod;
   amount: number;
+  cashReceived?: number;
 }
 
 export interface SaleResponse {
@@ -47,6 +48,7 @@ export interface SaleItemRequest {
 export interface SalePaymentRequest {
   paymentMethod: PaymentMethod;
   amount: number;
+  cashReceived?: number;
 }
 
 export interface SaleRequest {
@@ -71,9 +73,9 @@ export interface SaleReturnRequest {
   items: SaleReturnItemRequest[];
 }
 
-export interface SaleReturnItemRepsonse {
+export interface SaleReturnItemResponse {
   id: number;
-  originalSaleItemId: number;
+  originalSaleItemId?: number;
   productId: number;
   productName: string;
   productCode: string;
@@ -85,15 +87,15 @@ export interface SaleReturnResponse {
   id: number;
   folio: string;
   saleId?: number;
-  saleFolio: string;
+  saleFolio?: string;
   employeeId: number;
   employeeName: string;
   returnDate: string;
   returnType: ReturnType;
-  totalRefuned: number;
+  totalRefunded: number;
   refundMethod: PaymentMethod;
   reason: string;
-  items: SaleReturnItemRepsonse[];
+  items: SaleReturnItemResponse[];
   freeReturn: boolean;
   createdBy: string;
   createdDateTime: string;

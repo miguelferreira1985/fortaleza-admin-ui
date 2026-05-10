@@ -98,6 +98,13 @@ $mid:     #f8bbd0;
     font-size: 0.8rem; font-weight: 700;
     color: $primary; text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    // ✅ Centrar columnas numéricas
+    span:nth-child(2),  // Cant.
+    span:nth-child(3),  // P. Unit.
+    span:nth-child(4) { // Subtotal
+      text-align: center;
+    }
   }
 
   .item-row {
@@ -122,8 +129,10 @@ $mid:     #f8bbd0;
       }
     }
 
+    // ✅ Centrar columnas numéricas
     .qty-col, .price-col, .total-col {
-      text-align: right; font-size: 0.9rem;
+      text-align: center;
+      font-size: 0.9rem;
     }
 
     .qty-col {

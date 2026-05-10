@@ -62,9 +62,9 @@
   <div class="items-list">
     <div class="list-header">
       <span>Producto</span>
-      <span class="qty-col">Cant.</span>
-      <span class="price-col">P. Unit.</span>
-      <span class="total-col">Subtotal</span>
+      <span>Cant.</span>
+      <span>P. Unit.</span>
+      <span>Subtotal</span>
     </div>
 
     @for (item of items; track item.productId) {
@@ -74,8 +74,8 @@
           <span class="product-code">Código: {{ item.productCode }}</span>
         </div>
         <span class="qty-col">{{ item.quantity }}</span>
-        <span class="price-col">{{ item.unitPrice | currency:'MXN':'symbol':'1.2-2' }}</span>
-        <span class="total-col">{{ item.subtotal | currency:'MXN':'symbol':'1.2-2' }}</span>
+        <span class="price-col">{{ getPriceWithoutTaxes(item.unitPrice) | currency:'MXN':'symbol':'1.2-2' }}</span>
+        <span class="total-col">{{ getSubtotalWihtoutTaxes(item.subtotal) | currency:'MXN':'symbol':'1.2-2' }}</span>
       </div>
     }
   </div>
@@ -85,6 +85,14 @@
     <div class="summary-row">
       <span>Total de productos:</span>
       <strong>{{ totalProducts }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>Subtotal (sin IVA):</span>
+      <strong>{{ subtotalWithoutTaxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>IVA (16%):</span>
+      <strong>{{ taxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
     </div>
     <div class="summary-row total">
       <span>TOTAL:</span>

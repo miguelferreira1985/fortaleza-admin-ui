@@ -8,7 +8,7 @@ type ApiErrorResponse = {
     status?: number,
     message?: string,
     errors?: Record<string, string[]> | string[] | string;
-    
+
 };
 
 function extractValidationMessages(errors: ApiErrorResponse['errors']): string {
@@ -49,6 +49,8 @@ function toFriendlyMessage(err: HttpErrorResponse): string {
       const details = extractValidationMessages(api?.errors);
       return details ? `Validación: ${details}` : (apiMsg ?? 'Datos no procesables (422).');
     }
+    case 429:
+      return apiMsg ?? 'Demasiadas solicitudes. Espera un momento e intenta de nuevo.';
     case 500:
       return apiMsg ?? 'Ocurrió un error en el servidor (500).';
     default:

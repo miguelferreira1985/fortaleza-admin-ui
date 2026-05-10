@@ -76,3 +76,11 @@ html, body {
   &.status-cancelada      { background: #ffebee; color: #c62828; }
 }
 
+.fullscreen-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    max-width: none !important;
+    width: 98vw !important;
+  }
+}
+

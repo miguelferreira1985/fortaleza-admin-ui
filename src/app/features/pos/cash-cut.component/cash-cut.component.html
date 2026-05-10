@@ -35,8 +35,9 @@
     @if (cutMode === 'DAY') {
       <mat-form-field appearance="outline">
         <mat-label>Fecha</mat-label>
-        <input matInput type="date" [(ngModel)]="selectedDate">
-        <mat-icon matPrefix>calendar_today</mat-icon>
+        <input matInput [matDatepicker]="dayPicker" [(ngModel)]="selectedDate">
+        <mat-datepicker-toggle matIconSuffix [for]="dayPicker"></mat-datepicker-toggle>
+        <mat-datepicker #dayPicker></mat-datepicker>
       </mat-form-field>
     }
 
@@ -65,16 +66,19 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Desde</mat-label>
-        <input matInput type="date" [(ngModel)]="dateFrom">
-        <mat-icon matPrefix>date_range</mat-icon>
+        <input matInput [matDatepicker]="fromPicker" [(ngModel)]="dateFrom">
+        <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Hasta</mat-label>
-        <input matInput type="date" [(ngModel)]="dateTo">
-        <mat-icon matPrefix>date_range</mat-icon>
+        <input matInput [matDatepicker]="toPicker" [(ngModel)]="dateTo">
+        <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
       </mat-form-field>
     }
+
 
     <button mat-raised-button color="primary" class="generate-btn"
       (click)="generateCut()" [disabled]="isLoading">

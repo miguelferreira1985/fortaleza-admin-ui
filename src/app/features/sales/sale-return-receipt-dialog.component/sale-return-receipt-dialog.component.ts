@@ -94,7 +94,7 @@ import { SaleReturnResponse } from '../../../shared/models/sale.models';
       <!-- Total reembolsado -->
       <div class="receipt-total">
         <span>TOTAL DEVUELTO</span>
-        <strong>{{ saleReturn.totalRefuned | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        <strong>{{ saleReturn.totalRefunded | currency:'MXN':'symbol':'1.2-2' }}</strong>
       </div>
 
       <div class="refund-method-row">

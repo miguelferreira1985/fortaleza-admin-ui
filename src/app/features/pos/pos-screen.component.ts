@@ -487,7 +487,23 @@ export class PosScreenComponent implements OnInit {
         quantity: i.quantity,
         discount: i.discount
       })),
-      payments: this.payments
+      payments: this.payments.map(p => {
+        let cashReceivedValue: number | undefined = undefined;
+
+        if (p.paymentMethod === 'EFECTIVO') {
+          if (this.cashReceived > 0) {
+            cashReceivedValue = this.cashReceived;
+          } else {
+            cashReceivedValue = p.amount;
+          }
+        }
+
+        return {
+          paymentMethod: p.paymentMethod,
+          amount: p.amount,
+          cashReceived: cashReceivedValue
+        };
+      })
     };
 
     this.saleService.createSale(request).subscribe({

@@ -198,3 +198,36 @@
     height: 18px;
   }
 }
+
+.cash-details {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 8px 0; margin: 4px 0;
+  border-top: 1px dashed #f8bbd0;
+}
+
+.cash-detail-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; border-radius: 8px;
+  font-size: 0.88rem;
+
+  .cash-label {
+    display: flex; align-items: center; gap: 6px;
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+
+  .cash-value { font-weight: 600; }
+
+  &.cash-received-row {
+    background: #e3f2fd;
+    .cash-label { color: #1565c0; }
+    .cash-label mat-icon { color: #1976d2; }
+    .cash-value { color: #0d47a1; }
+  }
+
+  &.change-row {
+    background: #e8f5e9;
+    .cash-label { color: #2e7d32; }
+    .cash-label mat-icon { color: #388e3c; }
+    .cash-value { color: #1b5e20; }
+  }
+}
