@@ -1,0 +1,85 @@
+.page-header {
+  margin-bottom: 1rem;
+  h1 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.6rem; font-weight: 600; color: #880e4f; margin: 0;
+    mat-icon { font-size: 1.8rem; width: 1.8rem; height: 1.8rem; color: #e91e63; }
+  }
+}
+
+.filter-card, .results-card {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07) !important;
+  margin-bottom: 1rem;
+
+  mat-card-header {
+    padding: 16px 20px 0;
+    mat-card-title {
+      display: flex !important; align-items: center; gap: 8px;
+      font-size: 1rem !important; font-weight: 600 !important; color: #880e4f;
+      mat-icon { font-size: 18px; width: 18px; height: 18px; color: #e91e63; }
+    }
+  }
+
+  mat-card-content { padding: 16px 20px 20px !important; }
+  .p-0 { padding: 0 !important; }
+}
+
+.filter-row {
+  display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
+  .filter-field-lg { flex: 2; min-width: 220px; }
+  .filter-field-md { flex: 1; min-width: 160px; }
+}
+
+.search-btn {
+  height: 56px; margin-top: 0; border-radius: 8px !important; font-weight: 600;
+  ::ng-deep .mdc-button__label { display: flex; align-items: center; gap: 6px; }
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 48px; color: #ad1457;
+  mat-icon { font-size: 3rem; width: 3rem; height: 3rem; opacity: 0.3; }
+  p { margin: 8px 0 0; font-size: 0.9rem; }
+}
+
+.table-scroll { overflow-x: auto; }
+
+.po-table {
+  width: 100%;
+  thead tr { background-color: #fce4ec; }
+  th { font-weight: 600; font-size: 0.85rem; color: #880e4f; padding: 0.85rem 1rem; border-bottom: 2px solid #f8bbd0; white-space: nowrap; }
+  td { padding: 0.75rem 1rem; font-size: 0.88rem; border-bottom: 1px solid #fce4ec; }
+  .table-row { transition: background 0.15s; &:hover { background: #fff5f8; } }
+  .actions-col { width: 120px; text-align: center; }
+  .actions-cell { text-align: center; white-space: nowrap; button { margin: 0 1px; } }
+}
+
+.folio-text { font-family: 'Courier New', monospace; color: #880e4f; font-weight: 700; }
+
+.date-cell {
+  display: flex; flex-direction: column;
+  small { color: #888; font-size: 0.78rem; }
+}
+
+.no-data-msg {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 32px; color: #ad1457;
+  mat-icon { font-size: 2.5rem; width: 2.5rem; height: 2.5rem; opacity: 0.3; }
+  p { margin: 0; }
+}
+
+mat-paginator { border-top: 1px solid #fce4ec; background: #fff5f8; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinner { animation: spin 1s linear infinite; }
+
+.no-results {
+  color: #999;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+::ng-deep .mat-mdc-autocomplete-panel {
+  max-height: 350px !important;
+}

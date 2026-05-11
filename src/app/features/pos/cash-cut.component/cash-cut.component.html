@@ -1,0 +1,251 @@
+<!-- cash-cut.component.html -->
+
+<div class="page-header no-print">
+  <h1>
+    <mat-icon>calculate</mat-icon>
+    Corte de Caja
+  </h1>
+</div>
+
+<!-- ── PANEL DE FILTROS ─────────────────────────────────────── -->
+<div class="filters-card no-print">
+
+  <!-- Selector de modo -->
+  <div class="mode-selector">
+    <button class="mode-btn" [class.active]="cutMode === 'DAY'"
+      (click)="cutMode = 'DAY'; onModeChange()">
+      <mat-icon>today</mat-icon>
+      <span>Por día</span>
+    </button>
+    <button class="mode-btn" [class.active]="cutMode === 'SESSION'"
+      (click)="cutMode = 'SESSION'; onModeChange()">
+      <mat-icon>access_time</mat-icon>
+      <span>Por turno</span>
+    </button>
+    <button class="mode-btn" [class.active]="cutMode === 'EMPLOYEE'"
+      (click)="cutMode = 'EMPLOYEE'; onModeChange()">
+      <mat-icon>badge</mat-icon>
+      <span>Por empleado</span>
+    </button>
+  </div>
+
+  <!-- Filtros según el modo -->
+  <div class="filter-fields">
+
+    @if (cutMode === 'DAY') {
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="dayPicker" [(ngModel)]="selectedDate">
+        <mat-datepicker-toggle matIconSuffix [for]="dayPicker"></mat-datepicker-toggle>
+        <mat-datepicker #dayPicker></mat-datepicker>
+      </mat-form-field>
+    }
+
+    @if (cutMode === 'SESSION') {
+      <mat-form-field appearance="outline" class="wide">
+        <mat-label>Sesión de caja</mat-label>
+        <mat-select [(ngModel)]="selectedSessionId">
+          @for (s of sessions; track s.id) {
+            <mat-option [value]="s.id">{{ getSessionLabel(s) }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>access_time</mat-icon>
+      </mat-form-field>
+    }
+
+    @if (cutMode === 'EMPLOYEE') {
+      <mat-form-field appearance="outline">
+        <mat-label>Empleado</mat-label>
+        <mat-select [(ngModel)]="selectedEmployeeId">
+          @for (e of availableEmployees; track e.id) {
+            <mat-option [value]="e.id">{{ e.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>badge</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Desde</mat-label>
+        <input matInput [matDatepicker]="fromPicker" [(ngModel)]="dateFrom">
+        <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fromPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hasta</mat-label>
+        <input matInput [matDatepicker]="toPicker" [(ngModel)]="dateTo">
+        <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+        <mat-datepicker #toPicker></mat-datepicker>
+      </mat-form-field>
+    }
+
+
+    <button mat-raised-button color="primary" class="generate-btn"
+      (click)="generateCut()" [disabled]="isLoading">
+      @if (isLoading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <mat-icon>calculate</mat-icon>
+      }
+      Generar corte
+    </button>
+  </div>
+</div>
+
+<!-- ── REPORTE ─────────────────────────────────────────────── -->
+@if (report) {
+
+<div class="report-wrapper">
+
+  <!-- Botón imprimir -->
+  <div class="report-actions no-print">
+    <button mat-stroked-button color="primary" (click)="print()">
+      <mat-icon>print</mat-icon>
+      Imprimir corte
+    </button>
+  </div>
+
+  <!-- El reporte imprimible -->
+  <div class="report" id="cash-cut-report">
+
+    <div class="report-header">
+      <mat-icon class="report-logo no-print">storefront</mat-icon>
+      <h2>La Fortaleza</h2>
+      <h3>{{ getCutTitle() }}</h3>
+      @if (report.employeeName) {
+        <p class="report-employee">{{ report.employeeName }}</p>
+      }
+      <p class="report-period">
+        {{ report.periodFrom | date:'dd/MM/yyyy HH:mm' }}
+        — {{ report.periodTo | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+    </div>
+
+    <div class="report-divider">═══════════════════════════════</div>
+
+    <!-- ── EFECTIVO ─────────────────────────────────────── -->
+    <div class="report-section">
+      <div class="section-title">
+        <mat-icon>payments</mat-icon>
+        EFECTIVO
+      </div>
+
+      @if (report.openingAmount) {
+        <div class="report-row">
+          <span>Fondo inicial</span>
+          <span>{{ report.openingAmount | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+      <div class="report-row">
+        <span>Ventas en efectivo</span>
+        <span>{{ report.totalCashSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+      </div>
+      @if (report.totalCashInflows > 0) {
+        <div class="report-row income">
+          <span>(+) Entradas registradas</span>
+          <span>{{ report.totalCashInflows | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+      @if (report.totalCashOutflows > 0) {
+        <div class="report-row expense">
+          <span>(-) Salidas registradas</span>
+          <span>{{ report.totalCashOutflows | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+      @if (report.totalCashRefunds > 0) {
+        <div class="report-row expense">
+          <span>(-) Devoluciones en efectivo</span>
+          <span>{{ report.totalCashRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+
+      <div class="report-subtotal">
+        <span>Esperado en caja</span>
+        <strong>{{ report.expectedCash | currency:'MXN':'symbol':'1.2-2' }}</strong>
+      </div>
+
+      <!-- Solo en cortes de sesión con cierre -->
+      @if (report.declaredCash !== null && report.declaredCash !== undefined) {
+        <div class="report-row declared">
+          <span>Declarado por cajero</span>
+          <span>{{ report.declaredCash | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="report-difference" [ngClass]="getDifferenceClass(report.cashDifference)">
+          <mat-icon>{{ (report.cashDifference ?? 0) >= 0 ? 'check_circle' : 'warning' }}</mat-icon>
+          <span>{{ getDifferenceLabel(report.cashDifference) }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="report-divider">───────────────────────────────</div>
+
+    <!-- ── TARJETA ───────────────────────────────────────── -->
+    <div class="report-section">
+      <div class="section-title">
+        <mat-icon>credit_card</mat-icon>
+        TARJETA
+      </div>
+      <div class="report-row">
+        <span>Ventas con tarjeta</span>
+        <span>{{ report.totalCardSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+      </div>
+      @if (report.totalCardRefunds > 0) {
+        <div class="report-row expense">
+          <span>(-) Devoluciones</span>
+          <span>{{ report.totalCardRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+      <div class="report-subtotal">
+        <span>Total neto tarjeta</span>
+        <strong>{{ report.netCardTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+      </div>
+      <p class="verify-hint">Verificar contra terminal bancaria</p>
+    </div>
+
+    <div class="report-divider">───────────────────────────────</div>
+
+    <!-- ── TRANSFERENCIA ─────────────────────────────────── -->
+    <div class="report-section">
+      <div class="section-title">
+        <mat-icon>account_balance</mat-icon>
+        TRANSFERENCIA
+      </div>
+      <div class="report-row">
+        <span>Ventas por transferencia</span>
+        <span>{{ report.totalTransferSales | currency:'MXN':'symbol':'1.2-2' }}</span>
+      </div>
+      @if (report.totalTransferRefunds > 0) {
+        <div class="report-row expense">
+          <span>(-) Devoluciones</span>
+          <span>{{ report.totalTransferRefunds | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+      }
+      <div class="report-subtotal">
+        <span>Total neto transferencia</span>
+        <strong>{{ report.netTransferTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+      </div>
+      <p class="verify-hint">Verificar contra estado de cuenta</p>
+    </div>
+
+    <div class="report-divider">═══════════════════════════════</div>
+
+    <!-- ── TOTAL GENERAL ────────────────────────────────── -->
+    <div class="report-grand-total">
+      <span>TOTAL VENDIDO</span>
+      <strong>{{ report.grandTotal | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+
+    <div class="report-footer">
+      <p>Generado: {{ report.periodTo | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p>La Fortaleza — Sistema de Ventas</p>
+    </div>
+
+  </div>
+</div>
+
+} @else if (!isLoading) {
+  <div class="empty-state">
+    <mat-icon>calculate</mat-icon>
+    <p>Selecciona el tipo de corte y haz clic en "Generar corte"</p>
+  </div>
+}

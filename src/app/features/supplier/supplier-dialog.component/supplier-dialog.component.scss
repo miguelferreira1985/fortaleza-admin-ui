@@ -1,0 +1,67 @@
+.dialog-content {
+  padding: 8px 24px 16px;
+  min-width: 420px;
+
+  @media (max-width: 600px) {
+    min-width: unset;
+    padding: 8px 16px 16px;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #880e4f;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 12px 0 12px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #e91e63;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full-width { width: 100%; }
+.half-width { width: 100%; }
+
+.submit-btn {
+  min-width: 110px;
+  border-radius: 8px !important;
+  font-weight: 600;
+
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.dialog-actions {
+  padding: 8px 24px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #fce4ec;
+
+  button { border-radius: 8px !important; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spinner { animation: spin 1s linear infinite; }

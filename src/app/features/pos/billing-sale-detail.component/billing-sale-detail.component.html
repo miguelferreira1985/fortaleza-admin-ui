@@ -1,0 +1,121 @@
+<!-- billing-sale-detail.component.html -->
+
+<div class="page-header">
+  <button mat-icon-button (click)="goBack()" class="back-btn" matTooltip="Volver">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <div class="header-content">
+    <h1>
+      <mat-icon>receipt</mat-icon>
+      {{ folio }}
+    </h1>
+    <div class="header-info">
+      <span class="client-name">{{ clientName }}</span>
+      @if (isAccumulated) {
+        <span class="period-badge">
+          Acumulado: {{ dateFrom | date:'dd/MM/yy' }} — {{ dateTo | date:'dd/MM/yy' }}
+        </span>
+      }
+    </div>
+  </div>
+  <button mat-stroked-button class="print-btn" (click)="print()">
+    <mat-icon>print</mat-icon>
+    Imprimir
+  </button>
+</div>
+
+@if (isLoading) {
+  <div class="loading-center"><mat-spinner diameter="48"></mat-spinner></div>
+} @else {
+
+<div class="ticket-card">
+
+  <!-- Cabecera del ticket -->
+  <div class="ticket-header">
+    <div class="method-badge"
+      [ngClass]="{
+        'cash': paymentMethod === 'EFECTIVO',
+        'card': paymentMethod === 'TARJETA',
+        'transfer': paymentMethod === 'TRANSFERENCIA'
+      }">
+      <mat-icon>
+        @if (paymentMethod === 'EFECTIVO') { payments }
+        @if (paymentMethod === 'TARJETA') { credit_card }
+        @if (paymentMethod === 'TRANSFERENCIA') { account_balance }
+      </mat-icon>
+      <span>
+        @if (paymentMethod === 'EFECTIVO') { Efectivo }
+        @if (paymentMethod === 'TARJETA') { Tarjeta }
+        @if (paymentMethod === 'TRANSFERENCIA') { Transferencia }
+      </span>
+    </div>
+
+    @if (isAccumulated) {
+      <div class="info-alert">
+        <mat-icon>info</mat-icon>
+        <span>Este es un consolidado de todas las compras en efectivo del período</span>
+      </div>
+    }
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="items-list">
+    <div class="list-header">
+      <span>Producto</span>
+      <span>Cant.</span>
+      <span>P. Unit.</span>
+      <span>Subtotal</span>
+    </div>
+
+    @for (item of items; track item.productId) {
+      <div class="item-row">
+        <div class="product-info">
+          <span class="product-name">{{ item.productName }}</span>
+          <span class="product-code">Código: {{ item.productCode }}</span>
+        </div>
+        <span class="qty-col">{{ item.quantity }}</span>
+        <span class="price-col">{{ getPriceWithoutTaxes(item.unitPrice) | currency:'MXN':'symbol':'1.2-2' }}</span>
+        <span class="total-col">{{ getSubtotalWihtoutTaxes(item.subtotal) | currency:'MXN':'symbol':'1.2-2' }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Resumen -->
+  <div class="ticket-summary">
+    <div class="summary-row">
+      <span>Total de productos:</span>
+      <strong>{{ totalProducts }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>Subtotal (sin IVA):</span>
+      <strong>{{ subtotalWithoutTaxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+    <div class="summary-row">
+      <span>IVA (16%):</span>
+      <strong>{{ taxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+    <div class="summary-row total">
+      <span>TOTAL:</span>
+      <strong>{{ total | currency:'MXN':'symbol':'1.2-2' }}</strong>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  @if (items.length === 0) {
+    <div class="empty-state">
+      <mat-icon>shopping_cart</mat-icon>
+      <p>No hay productos en esta venta</p>
+    </div>
+  }
+
+</div>
+
+}
+
+<!-- Print styles -->
+<style>
+@media print {
+  .page-header .back-btn, .print-btn { display: none !important; }
+  .ticket-card { box-shadow: none; }
+}
+</style>

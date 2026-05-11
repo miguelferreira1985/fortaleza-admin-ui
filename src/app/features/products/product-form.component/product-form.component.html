@@ -1,0 +1,314 @@
+<!-- Header de la página -->
+<div class="form-page-header">
+  <div class="header-left">
+    <button mat-icon-button (click)="goBack()" matTooltip="Volver a productos" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1>{{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}</h1>
+      <span class="header-subtitle">{{ isEditMode ? 'Modifica los datos del producto' : 'Completa los datos del nuevo producto' }}</span>
+    </div>
+  </div>
+</div>
+
+@if (isLoading) {
+  <div class="page-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Cargando producto...</p>
+  </div>
+} @else {
+
+<form [formGroup]="form" class="product-form">
+
+  <!-- ===== SECCIÓN 1: INFORMACIÓN BÁSICA ===== -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>info</mat-icon>
+        Información básica
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <div class="form-row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Hilo de Algodón Blanco" maxlength="50">
+          <mat-hint align="end">{{ c('name').value?.length || 0 }} / 100</mat-hint>
+          @if (c('name').touched && c('name').hasError('required')) {
+            <mat-error>El nombre es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Clave</mat-label>
+          <input matInput formControlName="code" placeholder="Ej: HIL-ALG-001" maxlength="20" style="text-transform:uppercase">
+          <mat-hint align="end">{{ c('code').value?.length || 0 }} / 50</mat-hint>
+          @if (c('code').touched && c('code').hasError('required')) {
+            <mat-error>La clave es obligatoria</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descripción</mat-label>
+        <textarea matInput formControlName="description" rows="2" placeholder="Descripción opcional del producto"></textarea>
+        <mat-icon matPrefix>notes</mat-icon>
+      </mat-form-field>
+
+      <div class="form-row-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Subcategoría</mat-label>
+          <mat-select formControlName="subcategoryId">
+            <mat-option [value]="null">Sin subcategoría</mat-option>
+            @for (sub of subcategories; track sub.id) {
+              <mat-option [value]="sub.id">{{ sub.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>list</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Presentación</mat-label>
+          <mat-select formControlName="presentationId">
+            <mat-option [value]="null">Sin presentación</mat-option>
+            @for (pres of presentations; track pres.id) {
+              <mat-option [value]="pres.id">{{ pres.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>straighten</mat-icon>
+        </mat-form-field>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ===== SECCIÓN 2: PRECIOS Y COSTOS ===== -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>attach_money</mat-icon>
+        Precios y costos
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <div class="form-row-5">
+
+        <!-- Costo sin IVA (campo libre, no reactivo) -->
+        <mat-form-field appearance="outline">
+          <mat-label>Costo sin IVA</mat-label>
+          <input matInput type="number" [value]="costWithoutTaxes"
+            (input)="onCostWithoutTaxesChange($event)" min="0" step="0.01">
+          <mat-icon matPrefix>money_off</mat-icon>
+        </mat-form-field>
+
+        <!-- Costo con IVA (reactivo) -->
+        <mat-form-field appearance="outline">
+          <mat-label>Costo con IVA*</mat-label>
+          <input matInput type="number" formControlName="cost" min="0" step="0.01">
+          <mat-icon matPrefix>payments</mat-icon>
+          @if (c('cost').touched && c('cost').hasError('required')) {
+            <mat-error>El costo es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Costo sugerido (readonly) -->
+        <mat-form-field appearance="outline">
+          <mat-label>Costo sugerido</mat-label>
+          <input matInput type="number" formControlName="suggestedCost" readonly>
+          <mat-icon matPrefix>auto_fix_high</mat-icon>
+          <mat-hint>Promedio de proveedores</mat-hint>
+        </mat-form-field>
+
+        <!-- Ganancia % -->
+        <mat-form-field appearance="outline">
+          <mat-label>Ganancia (%)</mat-label>
+          <input matInput
+            type="number"
+            [value]="profitPercentage"
+            min="0"
+            step="0.01"
+            (input)="onProfitInput($event)"
+            (blur)="onProfitBlur()">
+          <mat-icon matPrefix>trending_up</mat-icon>
+          @if (c('cost').value && profitPercentage > 0) {
+            <mat-hint>+{{ (c('price').value - c('cost').value) | currency:'MXN':'symbol':'1.2-2' }}</mat-hint>
+          }
+        </mat-form-field>
+
+        <!-- Precio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Precio*</mat-label>
+          <input matInput type="number" formControlName="price" min="0" step="0.01">
+          <mat-icon matPrefix>sell</mat-icon>
+          @if (c('price').touched && c('price').hasError('required')) {
+            <mat-error>El precio es obligatorio</mat-error>
+          }
+          @if (form.hasError('priceLtCost')) {
+            <mat-error>El precio no puede ser menor al costo</mat-error>
+          }
+        </mat-form-field>
+
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ===== SECCIÓN 3: STOCK ===== -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>inventory_2</mat-icon>
+        Control de stock
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <div class="form-row-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Stock*</mat-label>
+          <input matInput type="number" formControlName="stock" min="0"
+            [readonly]="isEditMode">
+          <mat-icon matPrefix>inventory</mat-icon>
+          @if (isEditMode) {
+            <mat-hint>Usa "Ajustar stock" para modificar</mat-hint>
+          }
+          @if (c('stock').touched && c('stock').hasError('required')) {
+            <mat-error>El stock es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Stock Mínimo*</mat-label>
+          <input matInput type="number" formControlName="minimumStock" min="0">
+          <mat-icon matPrefix>arrow_downward</mat-icon>
+          @if (c('minimumStock').touched && c('minimumStock').hasError('required')) {
+            <mat-error>El stock mínimo es obligatorio</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Stock Máximo*</mat-label>
+          <input matInput type="number" formControlName="recommendedStock" min="0">
+          <mat-icon matPrefix>arrow_upward</mat-icon>
+        </mat-form-field>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ===== SECCIÓN 4: PROVEEDORES ===== -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>local_shipping</mat-icon>
+        Costos por proveedor
+      </mat-card-title>
+      <div class="card-header-actions">
+        <button mat-stroked-button color="primary" type="button" (click)="addSupplierRow()" class="add-supplier-btn">
+          <mat-icon>add</mat-icon>
+          Agregar proveedor
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      @if (supplierCosts.length === 0) {
+        <div class="no-suppliers">
+          <mat-icon>local_shipping</mat-icon>
+          <p>Sin proveedores configurados. Haz click en "Agregar proveedor"</p>
+        </div>
+      } @else {
+
+        <!-- Encabezado de la mini-tabla -->
+        <div class="supplier-table-header">
+          <span>Proveedor</span>
+          <span>Clave del proveedor</span>
+          <span>Costo sin IVA</span>
+          <span>Costo con IVA</span>
+          <span>Descuento (%)</span>
+          <span></span>
+        </div>
+
+        <div formArrayName="supplierCosts">
+          @for (group of supplierCosts.controls; track $index) {
+            <div [formGroupName]="$index" class="supplier-row">
+
+              <!-- Proveedor select -->
+              <mat-form-field appearance="outline" class="supplier-select">
+                <mat-select formControlName="supplierId" placeholder="Seleccionar">
+                  @for (s of suppliers; track s.id) {
+                    <mat-option [value]="s.id">{{ s.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Clave proveedor -->
+              <mat-form-field appearance="outline">
+                <input matInput formControlName="supplierProductCode" placeholder="Clave">
+                @if (group.get('supplierProductCode')?.touched && group.get('supplierProductCode')?.hasError('required')) {
+                  <mat-error>Requerido</mat-error>
+                }
+              </mat-form-field>
+
+              <!-- Costo sin IVA -->
+              <mat-form-field appearance="outline">
+                <input matInput type="number" formControlName="supplierCostWithoutTaxes" min="0" step="0.01">
+              </mat-form-field>
+
+              <!-- Costo con IVA -->
+              <mat-form-field appearance="outline">
+                <input matInput type="number" formControlName="supplierCostWithTaxes" min="0" step="0.01">
+              </mat-form-field>
+
+              <!-- Descuento -->
+              <mat-form-field appearance="outline">
+                <input matInput type="number" formControlName="discount" min="0" step="0.01">
+                <span matSuffix>%</span>
+              </mat-form-field>
+
+              <!-- Botón eliminar fila -->
+              <button mat-icon-button color="warn" type="button"
+                (click)="removeSupplierRow($index)" matTooltip="Quitar proveedor">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+          }
+        </div>
+
+      }
+
+      @if (supplierCosts.hasError('duplicateSuppliers')) {
+        <mat-error class="duplicate-error">
+          <mat-icon>warning</mat-icon>
+          No puedes agregar el mismo proveedor dos veces
+        </mat-error>
+      }
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Botones flotantes de acción -->
+  <div class="form-actions">
+    <button mat-button type="button" (click)="goBack()">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="onSubmit()"
+      [disabled]="form.invalid || isSaving" class="submit-btn">
+      @if (isSaving) {
+        <mat-icon class="spinner">refresh</mat-icon>
+        <span>Guardando...</span>
+      } @else {
+        <mat-icon>save</mat-icon>
+        <span>{{ isEditMode ? 'Guardar cambios' : 'Crear producto' }}</span>
+      }
+    </button>
+  </div>
+
+</form>
+
+}

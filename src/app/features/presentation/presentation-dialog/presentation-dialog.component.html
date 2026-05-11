@@ -1,0 +1,70 @@
+<!-- ===== HEADER — mat-dialog-title va directo en el h2 ===== -->
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+  {{ isEditMode ? 'Editar Presentación' : 'Nueva Presentación' }}
+</h2>
+
+<!-- ===== CONTENIDO ===== -->
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="presentationForm">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        placeholder="Ej: PIEZA"
+        maxlength="50">
+      <mat-icon matPrefix>label</mat-icon>
+      <mat-hint align="end">
+        {{ presentationForm.get('name')?.value?.length || 0 }} / 50
+      </mat-hint>
+      @if (hasError('name')) {
+        <mat-error>{{ getErrorMessage('name') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Abreviación</mat-label>
+      <input
+        matInput
+        formControlName="abbreviation"
+        placeholder="Ej: pza"
+        maxlength="10">
+      <mat-icon matPrefix>short_text</mat-icon>
+      <mat-hint align="end">
+        {{ presentationForm.get('abbreviation')?.value?.length || 0 }} / 10
+      </mat-hint>
+      @if (hasError('abbreviation')) {
+        <mat-error>{{ getErrorMessage('abbreviation') }}</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<!-- ===== ACCIONES ===== -->
+<mat-dialog-actions class="dialog-actions">
+  <button
+    mat-button
+    type="button"
+    (click)="onCancel()"
+    [disabled]="isLoading">
+    Cancelar
+  </button>
+
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="presentationForm.invalid || isLoading"
+    class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      Guardando...
+    } @else {
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      {{ isEditMode ? 'Guardar' : 'Crear' }}
+    }
+  </button>
+</mat-dialog-actions>

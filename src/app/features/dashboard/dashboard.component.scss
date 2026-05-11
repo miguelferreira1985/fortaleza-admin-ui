@@ -1,0 +1,324 @@
+.dashboard {
+  max-width: 1400px;
+}
+
+// Header de página
+.page-header {
+  margin-bottom: 24px;
+
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #880e4f;
+    margin: 0 0 4px;
+
+    mat-icon {
+      font-size: 1.8rem;
+      width: 1.8rem;
+      height: 1.8rem;
+      color: #e91e63;
+    }
+  }
+
+  .page-subtitle {
+    color: #ad1457;
+    font-size: 0.9rem;
+  }
+}
+
+// Grid de stats cards
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+// Cards de estadísticas
+.stat-card {
+  border-radius: 12px !important;
+  border-left: 4px solid transparent;
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px !important;
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: white;
+    }
+  }
+
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      line-height: 1.2;
+    }
+  }
+
+  // Variantes de color
+  &.stat-warning {
+    border-left-color: #f59e0b;
+    .stat-icon { background: #f59e0b; }
+  }
+
+  &.stat-primary {
+    border-left-color: #1976d2;
+    .stat-icon { background: #1976d2; }
+  }
+
+  &.stat-danger {
+    border-left-color: #ef4444;
+    .stat-icon { background: #ef4444; }
+  }
+
+  &.stat-info {
+    border-left-color: #8b5cf6;
+    .stat-icon { background: #8b5cf6; }
+  }
+}
+
+// 👇 NUEVO: Grid de 2 columnas
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // 50% - 50%
+  gap: 20px;
+  align-items: start;
+
+  // En pantallas chicas, volver a 1 columna
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Columna derecha con 2 cards apiladas
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// Card de la tabla (ahora más compacta)
+.table-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem !important;
+      color: #333;
+      font-weight: 600 !important;
+    }
+  }
+
+  mat-card-content {
+    padding: 0 !important;
+  }
+}
+
+// 👇 NUEVO: Contenedor de tabla con altura máxima
+.table-container {
+  max-height: 320px; // Altura fija
+  overflow-y: auto;
+}
+
+// 👇 NUEVO: Tabla compacta
+.compact-table {
+  width: 100%;
+  font-size: 0.85rem;
+
+  th {
+    background: #fce4ec;
+    color: #880e4f;
+    font-weight: 600;
+    padding: 8px 12px !important;
+    font-size: 0.8rem;
+  }
+
+  td {
+    padding: 8px 12px !important;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .product-code {
+    font-size: 0.82rem;
+    color: #333;
+    font-family: 'Courier New', monospace;
+  }
+
+  .min-stock {
+    color: #666;
+    font-size: 0.85rem;
+  }
+}
+
+// Badge de stock bajo
+.stock-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+
+  &.danger {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+}
+
+// 👇 NUEVO: Card de accesos rápidos
+.quick-actions-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 12px 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem !important;
+      color: #333;
+      font-weight: 600 !important;
+    }
+  }
+
+  mat-card-content {
+    padding: 16px !important;
+  }
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  button {
+    border-radius: 8px !important;
+    font-size: 0.85rem !important;
+    padding: 0 12px !important;
+    height: 40px !important;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+// 👇 NUEVO: Card de info del sistema
+.info-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 12px 16px;
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem !important;
+      color: #333;
+      font-weight: 600 !important;
+    }
+  }
+
+  mat-card-content {
+    padding: 12px 16px !important;
+  }
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fafafa;
+
+  mat-icon {
+    color: #e91e63;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .info-label {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .info-value {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+  }
+}
+
+// Estado vacío de la tabla
+.no-data {
+  text-align: center;
+  padding: 24px !important;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+
+  mat-icon {
+    color: #4caf50;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}

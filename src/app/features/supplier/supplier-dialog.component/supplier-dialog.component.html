@@ -1,0 +1,107 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+  {{ isEditMode ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="supplierForm">
+
+    <!-- ===== DATOS GENERALES ===== -->
+    <div class="section-title">
+      <mat-icon>store</mat-icon>
+      <span>Datos del proveedor</span>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name"
+          placeholder="Ej: Distribuidora Textil SA" maxlength="50">
+        <mat-icon matPrefix>business</mat-icon>
+        <mat-hint align="end">{{ supplierForm.get('name')?.value?.length || 0 }} / 50</mat-hint>
+        @if (hasError('name')) {
+          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Ubicación</mat-label>
+        <input matInput formControlName="location"
+          placeholder="Ej: CDMX" maxlength="20">
+        <mat-icon matPrefix>location_on</mat-icon>
+        <mat-hint align="end">{{ supplierForm.get('location')?.value?.length || 0 }} / 20</mat-hint>
+        @if (hasError('location')) {
+          <mat-error>{{ getErrorMessage('location') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- ===== DATOS DE CONTACTO ===== -->
+    <div class="section-title">
+      <mat-icon>contact_phone</mat-icon>
+      <span>Contacto</span>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre del contacto</mat-label>
+      <input matInput formControlName="contact"
+        placeholder="Ej: Juan Pérez" maxlength="50">
+      <mat-icon matPrefix>person</mat-icon>
+      <mat-hint align="end">{{ supplierForm.get('contact')?.value?.length || 0 }} / 50</mat-hint>
+      @if (hasError('contact')) {
+        <mat-error>{{ getErrorMessage('contact') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Tel. Contacto</mat-label>
+        <input matInput formControlName="contactPhone"
+          placeholder="Ej: 5551234567">
+        <mat-icon matPrefix>phone</mat-icon>
+        @if (hasError('contactPhone')) {
+          <mat-error>{{ getErrorMessage('contactPhone') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Tel. Oficina</mat-label>
+        <input matInput formControlName="officePhone"
+          placeholder="Ej: 5559876543">
+        <mat-icon matPrefix>business</mat-icon>
+        <mat-hint>Opcional</mat-hint>
+        @if (hasError('officePhone')) {
+          <mat-error>{{ getErrorMessage('officePhone') }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email"
+        placeholder="Ej: contacto@proveedor.com">
+      <mat-icon matPrefix>email</mat-icon>
+      <mat-hint>Opcional</mat-hint>
+      @if (hasError('email')) {
+        <mat-error>{{ getErrorMessage('email') }}</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button type="button" (click)="onCancel()" [disabled]="isLoading">
+    Cancelar
+  </button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="supplierForm.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      <span>{{ isEditMode ? 'Guardar' : 'Crear' }}</span>
+    }
+  </button>
+</mat-dialog-actions>

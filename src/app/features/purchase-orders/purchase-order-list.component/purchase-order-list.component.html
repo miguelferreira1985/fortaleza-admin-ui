@@ -1,0 +1,193 @@
+<div class="page-header">
+  <h1>
+    <mat-icon>receipt_long</mat-icon>
+    Órdenes de Compra
+  </h1>
+</div>
+
+<!-- Filtros -->
+<mat-card class="filter-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>filter_list</mat-icon>
+      Filtros de búsqueda
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="filterForm" (ngSubmit)="onSearch()">
+      <div class="filter-row">
+
+        <mat-form-field appearance="outline" class="filter-field-lg">
+          <mat-label>Proveedor</mat-label>
+          <input
+            type="text"
+            matInput
+            [formControl]="supplierSearchControl"
+            [matAutocomplete]="auto"
+            placeholder="Busca por nombre...">
+          <mat-icon matPrefix>local_shipping</mat-icon>
+
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            [displayWith]="displaySupplier"
+            (optionSelected)="onSupplierSelected($event.option.value)">
+
+            @for (supplier of filteredSuppliers$ | async; track supplier.id) {
+              <mat-option [value]="supplier">
+                {{ supplier.name }}
+              </mat-option>
+            }
+
+            @if ((filteredSuppliers$ | async)?.length === 0) {
+              <mat-option disabled>
+                <span class="no-results">No se encontraron proveedores</span>
+              </mat-option>
+            }
+
+          </mat-autocomplete>
+
+          @if (filterForm.get('supplierId')?.touched && filterForm.get('supplierId')?.hasError('required')) {
+            <mat-error>Selecciona un proveedor</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field-md">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="status">
+            @for (opt of statusOptions; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>info</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit"
+          [disabled]="!canSearch" class="search-btn">
+          @if (isLoading) {
+            <mat-icon class="spinner">refresh</mat-icon>
+            <span>Buscando...</span>
+          } @else {
+            <mat-icon>search</mat-icon>
+            <span>Buscar</span>
+          }
+        </button>
+
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<!-- Resultados -->
+<mat-card class="results-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>list</mat-icon>
+      Resultados
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content class="p-0">
+
+    @if (!hasSearched) {
+      <div class="empty-state">
+        <mat-icon>search</mat-icon>
+        <p>Selecciona un proveedor y haz click en Buscar</p>
+      </div>
+    } @else if (isLoading) {
+      <div class="empty-state">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table mat-table [dataSource]="dataSource" matSort class="po-table">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Folio</th>
+            <td mat-cell *matCellDef="let o">
+              <strong class="folio-text">#{{ o.id?.toString().padStart(4, '0') }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="supplierName">
+            <th mat-header-cell *matHeaderCellDef>Proveedor</th>
+            <td mat-cell *matCellDef="let o">{{ o.supplierName | uppercase }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdDateTime">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Creación</th>
+            <td mat-cell *matCellDef="let o">
+              <span class="date-cell">
+                {{ o.createdDateTime | date:'dd/MM/yyyy' }}
+                <small>{{ o.createdDateTime | date:'HH:mm' }}</small>
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let o">
+              <span class="po-status-chip" [ngClass]="getStatusConfig(o.status).cssClass">
+                <mat-icon>{{ getStatusConfig(o.status).icon }}</mat-icon>
+                {{ getStatusConfig(o.status).label }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalWithoutTaxes">
+            <th mat-header-cell *matHeaderCellDef>Total s/ IVA</th>
+            <td mat-cell *matCellDef="let o">{{ o.totalCostWithoutTaxes | currency:'MXN':'symbol':'1.2-2' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="totalWithTaxes">
+            <th mat-header-cell *matHeaderCellDef>Total c/ IVA</th>
+            <td mat-cell *matCellDef="let o">
+              <strong>{{ o.totalCostWithTaxes | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-col">Acciones</th>
+            <td mat-cell *matCellDef="let o" class="actions-cell">
+
+              <button mat-icon-button color="primary"
+                (click)="viewDetails(o)" matTooltip="Ver detalle">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              <button mat-icon-button style="color:#2e7d32"
+                (click)="markAsCompleted(o)" matTooltip="Marcar como completada"
+                [disabled]="o.status === statusEnum.CANCELADA || o.status === statusEnum.COMPLETADA">
+                <mat-icon>check_circle</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn"
+                (click)="cancelOrder(o)" matTooltip="Cancelar orden"
+                [disabled]="o.status !== statusEnum.PENDIENTE">
+                <mat-icon>cancel</mat-icon>
+              </button>
+
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+              <div class="no-data-msg">
+                <mat-icon>inbox</mat-icon>
+                <p>No hay órdenes para los filtros seleccionados</p>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10"
+        showFirstLastButtons>
+      </mat-paginator>
+    }
+
+  </mat-card-content>
+</mat-card>

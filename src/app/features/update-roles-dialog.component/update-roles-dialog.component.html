@@ -1,0 +1,43 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon>manage_accounts</mat-icon>
+  Editar permisos
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p class="dialog-subtitle">
+    Editando permisos de <strong>{{ data.user.username }}</strong>
+  </p>
+
+  <form [formGroup]="form">
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Permisos</mat-label>
+      <mat-select formControlName="roles" multiple>
+        @for (role of roles; track role.id) {
+          <mat-option [value]="role.id">
+            {{ role.name }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matPrefix>security</mat-icon>
+      @if (form.get('roles')?.touched && form.hasError('minimumSelected')) {
+        <mat-error>Selecciona al menos un permiso</mat-error>
+      }
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()"
+    [disabled]="form.invalid || isLoading" class="submit-btn">
+    @if (isLoading) {
+      <mat-icon class="spinner">refresh</mat-icon>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>save</mat-icon>
+      <span>Guardar</span>
+    }
+  </button>
+</mat-dialog-actions>

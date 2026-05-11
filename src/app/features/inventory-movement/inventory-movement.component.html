@@ -1,0 +1,205 @@
+<!-- ===== HEADER ===== -->
+<div class="page-header">
+  <h1>
+    <mat-icon>swap_horiz</mat-icon>
+    Movimientos de Inventario
+  </h1>
+  <p class="page-subtitle">Devoluciones y ajustes de stock</p>
+</div>
+
+<!-- ===== FILTROS ===== -->
+<div class="filter-card">
+  <div class="filters-row">
+
+    <!-- Filtro por producto -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Filtrar por producto</mat-label>
+      <input
+        matInput
+        [formControl]="productControl"
+        [matAutocomplete]="autoProd"
+        placeholder="Escribe para buscar...">
+      <mat-icon matPrefix>inventory</mat-icon>
+
+      @if (productControl.value) {
+        <button mat-icon-button matSuffix type="button" (click)="clearProductFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+
+      <mat-autocomplete #autoProd="matAutocomplete"
+        [displayWith]="displayProduct"
+        (optionSelected)="onProductSelected($event.option.value)">
+        @for (product of filteredProducts; track product.id) {
+          <mat-option [value]="product">
+            <div class="product-option">
+              <span class="product-option-name">{{ product.name }} </span>
+              <span class="product-option-code">{{ product.code | uppercase }}</span>
+            </div>
+          </mat-option>
+        }
+        @if (filteredProducts.length === 0) {
+          <mat-option disabled>Sin resultados</mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- 👇 NUEVO: Filtro por tipo de movimiento -->
+    <mat-form-field appearance="outline" class="filter-field filter-field-sm">
+      <mat-label>Tipo de movimiento</mat-label>
+      <mat-select [formControl]="movementTypeControl">
+        @for (option of movementTypeOptions; track option.value) {
+          <mat-option [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matPrefix>category</mat-icon>
+    </mat-form-field>
+
+  </div>
+
+  <!-- Hint dinámico -->
+  <div class="filter-hint">
+    @if (selectedProductId && movementTypeControl.value !== 'ALL') {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando movimientos tipo <strong>{{ selectedMovementTypeLabel }}</strong> del producto seleccionado</span>
+    } @else if (selectedProductId) {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando todos los movimientos del producto seleccionado</span>
+    } @else if (movementTypeControl.value !== 'ALL') {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando movimientos tipo <strong>{{ selectedMovementTypeLabel }}</strong> de todos los productos</span>
+    } @else {
+      <mat-icon>info</mat-icon>
+      <span>Mostrando devoluciones y ajustes de todos los productos</span>
+    }
+  </div>
+</div>
+
+<!-- ===== TABLA ===== -->
+<div class="content-card">
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <h2>Movimientos</h2>
+      <span class="total-badge">
+        {{ getTotalItems() }} {{ getTotalItems() === 1 ? 'registro' : 'registros' }}
+      </span>
+    </div>
+    <div class="toolbar-right">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Buscar movimiento</mat-label>
+        <input matInput [(ngModel)]="searchTerm" (ngModelChange)="applyFilter()"
+          placeholder="Producto, tipo, usuario...">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+
+    @if (isLoading) {
+      <div class="loading-overlay">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    }
+
+    <div class="table-scroll">
+      <table mat-table [dataSource]="dataSource" matSort class="movements-table">
+
+        <!-- ... todas tus columnas existentes ... -->
+        <!-- (mantén todo el código de la tabla igual) -->
+
+        <ng-container matColumnDef="productCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Producto</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="product-code">{{ m.productCode | uppercase }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="previousStock">
+          <th mat-header-cell *matHeaderCellDef>Stock Previo</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="stock-value">{{ m.previousStock }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef>Cantidad</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="quantity-value"
+              [class.positive]="m.quantity > 0"
+              [class.negative]="m.quantity < 0">
+              {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="newStock">
+          <th mat-header-cell *matHeaderCellDef>Stock Nuevo</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="stock-value">{{ m.newStock }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="movementType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="movement-chip" [ngClass]="getMovementTypeColor(m.movementType)">
+              <mat-icon>{{ getMovementTypeIcon(m.movementType) }}</mat-icon>
+              {{ m.movementType }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Justificación</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="description-text">{{ m.description || '—' }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="createdBy">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Hecho por</th>
+          <td mat-cell *matCellDef="let m">
+            <div class="user-info">
+              <mat-icon>account_circle</mat-icon>
+              <span>{{ m.createdBy }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="movementDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Fecha</th>
+          <td mat-cell *matCellDef="let m">
+            <span class="date-text">
+              {{ m.movementDate | date:'dd/MM/yyyy' }}
+              <small>{{ m.movementDate | date:'HH:mm' }}</small>
+            </span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+            @if (!isLoading) {
+              <div class="no-data-message">
+                <mat-icon>search_off</mat-icon>
+                <p>{{ searchTerm ? 'Sin resultados para "' + searchTerm + '"' : 'No hay movimientos registrados' }}</p>
+              </div>
+            }
+          </td>
+        </tr>
+
+      </table>
+    </div>
+
+    <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="25"
+      showFirstLastButtons aria-label="Seleccionar página">
+    </mat-paginator>
+
+  </div>
+</div>

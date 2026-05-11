@@ -1,0 +1,94 @@
+.login-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #fce4ec;  // 👈 Fondo gris clarito como el original
+}
+
+.login-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  width: 100%;
+  max-width: 850px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+// Card del logo — igual que el original
+.login-logo-card {
+  flex: 1;
+  max-width: 340px;
+  width: 100%;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem !important;
+
+  .logo-image {
+    max-width: 260px;
+    width: 100%;
+    height: auto;
+
+    @media (max-width: 768px) {
+      max-width: 180px;
+    }
+  }
+}
+
+// Card del formulario
+.login-form-card {
+  flex: 1;
+  max-width: 400px;
+  width: 100%;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 0.5rem 0 1rem;
+
+  mat-card-header {
+    padding: 1.5rem 1.5rem 0.5rem;
+    justify-content: center;
+
+    mat-card-title {
+      font-size: 1.5rem !important;
+      font-weight: 700 !important;
+      color: #880e4f !important;
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  mat-card-content {
+    padding: 1rem 1.5rem 0.5rem;
+  }
+
+  mat-card-actions {
+    padding: 0 1.5rem 1.5rem;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.submit-btn {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  letter-spacing: 0.5px;
+}
+
+.spinner-inline {
+  display: inline-block;
+  margin-right: 8px;
+}

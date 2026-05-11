@@ -1,0 +1,106 @@
+<h2 mat-dialog-title>
+  <mat-icon>remove_shopping_cart</mat-icon>
+  Devolución sin ticket
+</h2>
+
+<mat-dialog-content>
+
+  <div class="info-banner">
+    <mat-icon>info</mat-icon>
+    <p>Usa esta opción cuando el cliente no tiene comprobante de compra o la venta fue fuera del sistema.</p>
+  </div>
+
+  <!-- Monto a reembolsar -->
+  <p class="section-label">¿Cuánto se reembolsa?</p>
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Monto a reembolsar</mat-label>
+    <input matInput type="number" [(ngModel)]="amount" min="0.01" step="0.01" placeholder="0.00">
+    <mat-icon matPrefix>attach_money</mat-icon>
+    <span matSuffix>MXN</span>
+  </mat-form-field>
+
+  <!-- Método de reembolso -->
+  <p class="section-label">¿Cómo se devuelve el dinero?</p>
+  <div class="refund-methods">
+    @for (method of paymentMethods; track method.value) {
+      <button type="button" class="refund-method-btn"
+        [class.active]="refundMethod === method.value"
+        (click)="refundMethod = method.value">
+        <mat-icon>{{ method.icon }}</mat-icon>
+        <span>{{ method.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Motivo -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Motivo de la devolución</mat-label>
+    <textarea matInput [(ngModel)]="reason" rows="2"
+      placeholder="Ej: Producto defectuoso comprado antes del sistema, garantía..."></textarea>
+    <mat-icon matPrefix>notes</mat-icon>
+  </mat-form-field>
+
+  <!-- Producto opcional -->
+  <mat-divider></mat-divider>
+  <p class="section-label optional-label">
+    Producto devuelto
+    <span class="optional-tag">opcional</span>
+  </p>
+  <p class="section-hint">Si el cliente devuelve un artículo físico, búscalo aquí para restablecer el stock.</p>
+
+  <div class="product-search-wrapper">
+    <mat-icon class="search-icon">inventory_2</mat-icon>
+    <input class="product-input" type="text"
+      [(ngModel)]="productSearch"
+      (ngModelChange)="filterProducts()"
+      placeholder="Buscar producto por nombre o clave..."
+      autocomplete="off">
+    @if (selectedProduct) {
+      <button class="clear-btn" type="button" (click)="clearProduct()">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
+  </div>
+
+  <!-- Dropdown de productos -->
+  @if (showProductDropdown) {
+    <div class="product-dropdown">
+      @for (p of filteredProducts; track p.id) {
+        <button class="product-option" type="button" (click)="selectProduct(p)">
+          <span class="opt-code">{{ p.code | uppercase }}</span>
+          <span class="opt-name">{{ p.name }}</span>
+          <span class="opt-stock">Stock: {{ p.stock }}</span>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Cantidad a restablecer en inventario -->
+  @if (selectedProduct) {
+    <div class="qty-restore">
+      <mat-icon>inventory</mat-icon>
+      <span>¿Cuántas unidades regresan al inventario?</span>
+      <input class="qty-input" type="number"
+        [(ngModel)]="quantityToRestore"
+        min="0" step="1" placeholder="0">
+    </div>
+    <p class="qty-hint">
+      Stock actual de "{{ selectedProduct.name }}": <strong>{{ selectedProduct.stock }}</strong>
+    </p>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="isSaving">Cancelar</button>
+  <button mat-raised-button color="warn"
+    [disabled]="!canSave"
+    (click)="save()">
+    @if (isSaving) {
+      <mat-icon class="spin">refresh</mat-icon> Guardando...
+    } @else {
+      <mat-icon>remove_shopping_cart</mat-icon>
+      Registrar devolución
+    }
+  </button>
+</mat-dialog-actions>
