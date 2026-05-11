@@ -216,6 +216,7 @@
             <mat-divider />
 
             <button
+                *hasRole="['ROLE_ADMIN']"
                 mat-menu-item
                 (click)="openChangePasswordDialog()">
               <mat-icon>lock_reset</mat-icon>
