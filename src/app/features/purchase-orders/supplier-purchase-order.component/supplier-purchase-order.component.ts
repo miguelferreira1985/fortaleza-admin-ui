@@ -18,8 +18,7 @@ import { map, Observable, startWith } from 'rxjs';
     CommonModule,
     MaterialModule,
     ReactiveFormsModule,
-    FormsModule,
-    RouterLink
+    FormsModule
   ],
   templateUrl: './supplier-purchase-order.component.html',
   styleUrl: './supplier-purchase-order.component.scss',
@@ -51,7 +50,7 @@ export class SupplierPurchaseOrderComponent implements OnInit {
 
   today = new Date();
 
-  displayedColumns = ['id', 'createdDateTime', 'expectedDeliveryDate', 'status', 'totalWithTaxes', 'actions'];
+  displayedColumns = ['id', 'createdDateTime', 'status', 'totalWithTaxes', 'actions'];
 
   ngOnInit(): void {
     this.supplierId = Number(this.route.snapshot.paramMap.get('supplierId'));
@@ -173,10 +172,8 @@ export class SupplierPurchaseOrderComponent implements OnInit {
       quantityOrdered: i.quantity
     }));
 
-    const rawDate = this.orderForm.get('expectedDeliveryDate')?.value;
     const request: PurchaseOrderRequest = {
       supplierId: this.supplierId,
-      expectedDeliveryDate: rawDate ? (rawDate instanceof Date ? rawDate.toISOString() : new Date(rawDate).toISOString()) : undefined,
       items
     };
 
@@ -211,7 +208,6 @@ export class SupplierPurchaseOrderComponent implements OnInit {
 
   private initForm(): void {
     this.orderForm = this.fb.group({
-      expectedDeliveryDate: [null],
       productId: [null, Validators.required],
       quantity:  [null, [Validators.required, Validators.min(0.01)]]
     });

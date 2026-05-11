@@ -22,7 +22,7 @@ template: `
   <!-- El ticket en sí -->
   <div class="receipt" id="receipt-content">
     <div class="receipt-header">
-      <img src="assets/images/FortalezaLogoBlanco.jpeg" alt="La Fortaleza" class="receipt-logo">
+      <img src="assets/images/fortaleza-logo.png" alt="La Fortaleza" class="receipt-logo">
     </div>
 
     <div class="receipt-meta">

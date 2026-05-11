@@ -27,9 +27,7 @@ import { SaleReturnResponse } from '../../../shared/models/sale.models';
     <div class="receipt" id="return-receipt-content">
 
       <div class="receipt-header">
-        <mat-icon class="receipt-logo">storefront</mat-icon>
-        <h2>La Fortaleza</h2>
-        <p class="receipt-subtitle">Mercería y haberdashería</p>
+        <img src="assets/images/fortaleza-logo.png" alt="La Fortaleza" class="receipt-logo">
       </div>
 
       <div class="receipt-divider">────────────────────</div>
@@ -130,13 +128,18 @@ import { SaleReturnResponse } from '../../../shared/models/sale.models';
       margin: 0 auto;
     }
 
+    /* ✅ Logo como imagen */
     .receipt-header {
       text-align: center;
-      mat-icon.receipt-logo {
-        font-size: 40px; width: 40px; height: 40px; color: #880e4f;
+
+      img.receipt-logo {
+        width: 180px;
+        height: auto;
+        margin-bottom: 0px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
       }
-      h2 { margin: 4px 0 2px; font-size: 1.3rem; color: #880e4f; }
-      .receipt-subtitle { margin: 0; font-size: 0.8rem; color: #888; }
     }
 
     .receipt-divider {
@@ -217,7 +220,7 @@ import { SaleReturnResponse } from '../../../shared/models/sale.models';
       align-items: center;
       font-size: 1.1rem;
       padding: 4px 0;
-      strong { font-size: 1.25rem; color: #2e7d32; }
+      strong { font-size: 1.25rem; color: #880e4f; }
     }
 
     .refund-method-row {
@@ -238,9 +241,35 @@ import { SaleReturnResponse } from '../../../shared/models/sale.models';
       p { margin: 3px 0; }
     }
 
+    /* ✅ Estilos de impresión para 80mm (igual que recibo de venta) */
     @media print {
       .no-print { display: none !important; }
-      .receipt { padding: 0; margin: 0; max-width: 100%; }
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .receipt {
+        padding: 8px;
+        margin: 0 auto;
+        max-width: 72mm;
+        font-size: 12px;
+        line-height: 1.3;
+      }
+
+      @page {
+        size: 80mm auto;
+        margin: 0;
+      }
+
+      img.receipt-logo {
+        width: 200px;
+      }
+
+      .receipt-divider {
+        font-size: 10px;
+      }
     }
   `]
 })
