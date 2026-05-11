@@ -24,10 +24,8 @@ export class PurchaseOrderDetailComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private location = inject(Location);
   private purchaseOrderService = inject(PurchaseOrderService);
   private notify = inject(NotificationService);
-   private dialog = inject(MatDialog);
 
   orderId!: number;
   order: any = null;

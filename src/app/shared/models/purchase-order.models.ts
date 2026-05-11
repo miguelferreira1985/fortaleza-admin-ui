@@ -10,7 +10,6 @@ export interface PurchaseOrderItemRequest {
 
 export interface PurchaseOrderRequest {
     supplierId: number;
-    expectedDeliveryDate?: string;
     items: PurchaseOrderItemRequest[];
 }
 
@@ -32,7 +31,6 @@ export interface PurchaseOrder {
     supplierId: number;
     supplierName: string;
     status: PurchaseOrderStatus;
-    expectedDeliveryDate?: string;
     totalCostWithTaxes: number;
     totalCostWithoutTaxes: number;
     items: PurchaseOrderItem[];
@@ -54,7 +52,6 @@ export interface PurchaseOrderStatusUpdateRequestDTO {
 }
 
 export interface PurchaseOrderUpdateRequestDTO {
-    expectedDeliveryDate?: string | null;
     items: PurchaseOrderItemRequest[];
 }
 
@@ -74,7 +71,6 @@ export interface PurchaseOrderItemDetail {
     id: number;
     supplierId: number;
     supplierName: string;
-    expectedDeliveryDate: string;
     createdDateTime: string;
     status: 'PENDIENTE' | 'PARCIALMENTE_RECIBIDA' | 'COMPLETADA' | 'CANCELADA';
     totalCostWithTaxes: number;

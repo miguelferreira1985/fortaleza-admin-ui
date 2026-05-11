@@ -57,7 +57,7 @@ export class PurchaseOrderListComponent implements OnInit, AfterViewInit {
     { value: PurchaseOrderStatus.CANCELADA,      label: 'Cancelada' },
   ];
 
-  displayedColumns = ['id', 'supplierName', 'createdDateTime', 'expectedDeliveryDate', 'status', 'totalWithTaxes', 'totalWithoutTaxes', 'actions'];
+  displayedColumns = ['id', 'supplierName', 'createdDateTime', 'status', 'totalWithTaxes', 'totalWithoutTaxes', 'actions'];
 
   ngOnInit(): void {
     this.buildForm();

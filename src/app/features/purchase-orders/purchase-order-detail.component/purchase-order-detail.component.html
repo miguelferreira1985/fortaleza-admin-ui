@@ -97,11 +97,6 @@
         </div>
 
         <div class="info-item">
-          <span class="info-label">Fecha estimada de entrega</span>
-          <span>{{ order.expectedDeliveryDate | date:'dd/MM/yyyy' }}</span>
-        </div>
-
-        <div class="info-item">
           <span class="info-label">Productos</span>
           <span>{{ order.items?.length }} artículos</span>
         </div>
@@ -148,7 +143,7 @@
             </ng-container>
 
             <ng-container matColumnDef="ordered">
-              <th mat-header-cell *matHeaderCellDef>Ordenado</th>
+              <th mat-header-cell *matHeaderCellDef>Cantidad</th>
               <td mat-cell *matCellDef="let item">{{ item.quantityOrdered }}</td>
             </ng-container>
 

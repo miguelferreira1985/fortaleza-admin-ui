@@ -158,7 +158,7 @@ export class SaleReturnDialogComponent implements OnInit {
         this.notify.success('¡Devolución registrada!', `Reembolso: $${this.totalRefund.toFixed(2)}`);
         this.dialogRef.close(saleReturn);
         this.dialogRef.afterClosed().subscribe(() => { // 🔍 DEBUG
-          this.dialog.open(SaleReturnDialogComponent, {
+          this.dialog.open(SaleReturnReceiptDialogComponent, {
             width: '420px',
             data: { saleReturn },
             panelClass: 'receipt-dialog'

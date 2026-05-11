@@ -51,8 +51,12 @@
           </span>
         </div>
         <div class="info-item">
-          <span class="info-label">Fecha estimada</span>
-          <span>{{ order.expectedDeliveryDate | date:'dd/MM/yyyy' }}</span>
+          <span class="info-label">Total sin IVA</span>
+          <span>{{ order.totalCostWithoutTaxes | currency:'MXN':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Total con IVA</span>
+          <span>{{ order.totalCostWithTaxes | currency:'MXN':'symbol':'1.2-2' }}</span>
         </div>
       </div>
     </mat-card-content>
@@ -85,7 +89,7 @@
             <!-- Encabezado -->
             <div class="receive-header">
               <span>Producto</span>
-              <span>Ordenado</span>
+              <span>Cantidad</span>
               <span>Recibido</span>
               <span>Pendiente</span>
               <span>Recibir ahora</span>

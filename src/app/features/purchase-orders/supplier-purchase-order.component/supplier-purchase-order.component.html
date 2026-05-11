@@ -25,20 +25,6 @@
   <mat-card-content>
     <form [formGroup]="orderForm">
 
-      <!-- Fecha estimada -->
-      <mat-form-field appearance="outline" class="date-field">
-        <mat-label>Fecha estimada de entrega</mat-label>
-        <input
-          matInput
-          [matDatepicker]="picker"
-          formControlName="expectedDeliveryDate"
-          placeholder="dd/mm/aaaa"
-          [min]="today"
-          readonly>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-
       <mat-divider class="section-divider" />
 
       <!-- Agregar productos -->
@@ -179,11 +165,6 @@
           <ng-container matColumnDef="createdDateTime">
             <th mat-header-cell *matHeaderCellDef>Creación</th>
             <td mat-cell *matCellDef="let o">{{ o.createdDateTime | date:'dd/MM/yyyy' }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="expectedDeliveryDate">
-            <th mat-header-cell *matHeaderCellDef>Fecha estimada</th>
-            <td mat-cell *matCellDef="let o">{{ o.expectedDeliveryDate | date:'dd/MM/yyyy' }}</td>
           </ng-container>
 
           <ng-container matColumnDef="status">

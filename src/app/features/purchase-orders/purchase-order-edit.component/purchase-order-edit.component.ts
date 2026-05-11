@@ -51,7 +51,6 @@ export class PurchaseOrderEditComponent implements OnInit {
     this.orderId = +id;
 
     this.form = this.fb.group({
-      expectedDeliveryDate: [null],
       items: this.fb.array([])
     });
 
@@ -83,12 +82,6 @@ export class PurchaseOrderEditComponent implements OnInit {
   }
 
   populateForm(): void {
-    const rawDate = this.order.expectedDeliveryDate;
-
-    this.form.patchValue({
-      expectedDeliveryDate: rawDate ? new Date(rawDate) : null
-    });
-
     this.itemsArray.clear();
     (this.order.items ?? []).forEach((item: any) => {
       this.itemsArray.push(this.buildItemGroup(item));
@@ -179,12 +172,8 @@ export class PurchaseOrderEditComponent implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     this.isSaving = true;
-    const rawDate = this.form.get('expectedDeliveryDate')?.value;
 
     const dto = {
-      expectedDeliveryDate: rawDate
-        ? (rawDate instanceof Date ? rawDate.toISOString() : new Date(rawDate).toISOString())
-        : null,
       items: this.itemsArray.controls.map(ctrl => ({
         id:                   ctrl.get('itemId')?.value,
         productId:            ctrl.get('productId')?.value,
