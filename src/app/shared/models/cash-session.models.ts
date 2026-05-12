@@ -24,6 +24,10 @@ export interface CashSessionResponse {
   totalTransferSales?: number;
   totalCardRefunds?: number;
   totalTransferRefunds?: number;
+  totalCashSales?: number;
+  totalCashInflows?: number;
+  totalCashOutflows?: number;
+  totalCashRefunds?: number;
   status: CashSessionStatus;
   notes?: string;
   movements: CashMovementResponse[];

@@ -5,8 +5,6 @@ import { environment } from '../../../environments/environment';
 import { BehaviorSubject, catchError, filter, switchMap, throwError, take } from 'rxjs';
 
 const AUTH_BASE = `${environment.apiUrl}/auth`;
-const LOGIN_URL = `${AUTH_BASE}/login`;
-const REFRESH_URL = `${AUTH_BASE}/refresh`;
 
 let isRefreshing = false;
 const refreshToken$ = new BehaviorSubject<string | null>(null);

@@ -238,15 +238,16 @@ export class PosScreenComponent implements OnInit {
   filterProducts(): void {
     const term = this.productSearch.toLowerCase().trim();
 
-    this.filteredProducts = !term
-      ? [...this.allProducts]
-      : this.allProducts.filter(p =>
-        p.name.toLowerCase().includes(term) ||
-        p.code.toLowerCase().includes(term)
-      );
+    if (!term) {
+      this.filteredProducts = [...this.allProducts];
+      return;
+    }
+
+    const filtered = this.allProducts.filter(p => p.name.toLowerCase().includes(term) || p.code.toLowerCase().includes(term));
+    this.filteredProducts = this.sortByRelevance(filtered, term);
   }
 
-    addToCart(product: Product): void {
+  addToCart(product: Product): void {
     const existing = this.cart.find(i => i.product.id === product.id);
     if (existing) {
       // Remover comentario cuando el inventario sea completado
@@ -335,11 +336,6 @@ export class PosScreenComponent implements OnInit {
     this.toBeBilled = false;
   }
 
-    private recalculateItem(item: CartItem): void {
-    const factor = 1 - (item.discount || 0) / 100;
-    item.subtotal = Math.round(item.product.price * item.quantity * factor * 100) / 100;
-  }
-
   togglePaymentMethod(method: PaymentMethod): void {
     const existing = this.payments.find(p => p.paymentMethod === method);
 
@@ -362,12 +358,6 @@ export class PosScreenComponent implements OnInit {
 
   setExactAmount(payment: CartPayment): void {
     payment.amount = this.pendingAmount + payment.amount;
-  }
-
-  private recalculatePayments(): void {
-    if (this.payments.length === 1) {
-      this.payments[0].amount = this.cartTotal;
-    }
   }
 
   getChange(): number {
@@ -551,6 +541,35 @@ export class PosScreenComponent implements OnInit {
 
   goToReturns(): void {
     this.router.navigate(['/pos/returns']);
+  }
+
+  private recalculateItem(item: CartItem): void {
+    const factor = 1 - (item.discount || 0) / 100;
+    item.subtotal = Math.round(item.product.price * item.quantity * factor * 100) / 100;
+  }
+
+  private recalculatePayments(): void {
+    if (this.payments.length === 1) {
+      this.payments[0].amount = this.cartTotal;
+    }
+  }
+
+  private sortByRelevance(products: Product[], searchTerm: string): Product[] {
+
+    return products.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const aCode = a.code.toLowerCase();
+      const bCode = b.code.toLowerCase();
+      const search = searchTerm.toLowerCase();
+      const aStarts = aName.startsWith(search) || aCode.startsWith(search);
+      const bStarts = bName.startsWith(search) || bCode.startsWith(search);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return aName.localeCompare(bName, 'es', { sensitivity: 'base' });
+    });
   }
 
 }

@@ -7,6 +7,7 @@ export interface SaleItemResponse {
   productId: number;
   productName: string;
   productCode: string;
+  presentationAbbreviation?: string;
   quantity: number;
   unitPrice: number;
   discount: number;

@@ -15,23 +15,18 @@ function extractValidationMessages(errors: ApiErrorResponse['errors']): string {
     if (!errors) return '';
     if (Array.isArray(errors)) return errors.join(', ');
     if (typeof errors === 'string') return errors;
-    // errors como { field: [msg1, msg2], ... }
     return Object.entries(errors)
         .map(([field, msgs]) => Array.isArray(msgs) ? `${field}: ${msgs.join(': ')}` : `${field}: ${msgs}`)
         .join(', ');
 }
 
 function toFriendlyMessage(err: HttpErrorResponse): string {
-    // Fallos de red u orgen CORS
     if (err.status === 0) return 'No se pudo conectar al servidor. Verificatu tu conexión o el CORS del backend.';
 
     const api: ApiErrorResponse | undefined = err.error;
 
-    // Intenta extraer mensaje del backend (ApiResponse)
     const apiMsg = api?.message ?? (typeof err.error === 'string' ? err.error : null);
 
-    // Mensajes pro status
-      // Mensajes por status
   switch (err.status) {
     case 400: {
       const details = extractValidationMessages(api?.errors);
@@ -65,13 +60,10 @@ export const errorInterceptor: HttpInterceptorFn = ((req, next) => {
         catchError((err: HttpErrorResponse) => {
             const friendlyMessage = toFriendlyMessage(err);
 
-
-            // Opcional: evita duplicar mensajes de 401 si tu auth.interceptor ya maneja refresh
             if (err.status !== 401) {
                 notify.error(err.error.message, err.error.errors);
             }
 
-            // Reinyecta el error con un campo friendlyMessge para que el componente lo pueda usar
             const enhaced = Object.assign(err, { friendlyMessage });
             return throwError(() => enhaced);
         })

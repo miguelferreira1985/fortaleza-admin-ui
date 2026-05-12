@@ -20,7 +20,7 @@ interface ReturnItemState {
   saleItem: SaleItemResponse;
   selected: boolean;
   quantityToReturn: number;
-  alreadyReturned: number;  // cuánto ya fue devuelto antes
+  alreadyReturned: number;
   availableToReturn: number;
   refundAmount: number;
 }
@@ -61,15 +61,10 @@ export class SaleReturnDialogComponent implements OnInit {
     this.buildItemStates();
   }
 
-  // ── Build ─────────────────────────────────────────────────
-
   private buildItemStates(): void {
-    // Calculamos cuánto ya fue devuelto de cada ítem sumando las devoluciones anteriores
     const returnedMap = new Map<number, number>();
 
     this.sale.items.forEach(item => {
-      // Si hay devoluciones previas en la venta cargada las sumamos
-      // (el backend es la fuente de verdad, aquí es solo para la UI)
       returnedMap.set(item.id, 0);
     });
 
@@ -86,8 +81,6 @@ export class SaleReturnDialogComponent implements OnInit {
       };
     });
   }
-
-  // ── Interacción ───────────────────────────────────────────
 
   toggleItem(state: ReturnItemState): void {
     if (state.availableToReturn <= 0) return;
@@ -116,8 +109,6 @@ export class SaleReturnDialogComponent implements OnInit {
     ) / 100;
   }
 
-  // ── Getters ───────────────────────────────────────────────
-
   get selectedItems(): ReturnItemState[] {
     return this.itemStates.filter(s => s.selected);
   }
@@ -133,10 +124,7 @@ export class SaleReturnDialogComponent implements OnInit {
       && !this.isSaving;
   }
 
-  // ── Guardar ───────────────────────────────────────────────
-
   save(): void {
-    alert('Entrando  save');
     if (!this.canSave) return;
 
     const request: SaleReturnRequest = {
@@ -152,8 +140,6 @@ export class SaleReturnDialogComponent implements OnInit {
     this.saleService.createReturn(this.sale.id, request).subscribe({
       next: (res) => {
         const saleReturn: SaleReturnResponse = res.data;
-        console.log('SaleReturn data:', saleReturn);
-        console.log('Items:', saleReturn.items);
         this.isSaving = false;
         this.notify.success('¡Devolución registrada!', `Reembolso: $${this.totalRefund.toFixed(2)}`);
         this.dialogRef.close(saleReturn);

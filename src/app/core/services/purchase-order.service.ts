@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { PurchaseOrder, PurchaseOrderDetail, PurchaseOrderRequest, PurchaseOrderStatusUpdateRequestDTO, PurchaseOrderUpdateRequestDTO } from '../../shared/models/purchase-order.models';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApiResponse } from '../../shared/models/api-response';
 
 @Injectable({
