@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { BillingClientDetail, BillingClientSummary, BillingItemDetail, FreeReturnRequest, PaymentMethod, SaleCancelRequest, SaleRequest, SaleResponse, SaleReturnRequest, SaleReturnResponse } from "../../shared/models/sale.models";
-import { map, Observable } from "rxjs";
+import { Observable } from "rxjs";
 import { ApiResponse } from "../../shared/models/api-response";
 
 @Injectable({ providedIn: 'root'})
@@ -41,8 +41,6 @@ export class SaleService {
   cancelSale(id: number, request: SaleCancelRequest): Observable<ApiResponse<SaleResponse>> {
     return this.http.put<ApiResponse<SaleResponse>>(`${this.apiUrl}${this.path}/${id}/cancel`, request);
   }
-
-  // ── Devoluciones ──────────────────────────────────────────
 
   createReturn(saleId: number, request: SaleReturnRequest): Observable<ApiResponse<SaleReturnResponse>> {
     return this.http.post<ApiResponse<SaleReturnResponse>>(`${this.apiUrl}${this.path}/${saleId}/returns`, request);

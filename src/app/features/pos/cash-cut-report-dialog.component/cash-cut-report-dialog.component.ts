@@ -46,7 +46,29 @@ export class CashCutReportDialogComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        // Si falla, usar los datos básicos de la sesión
+        this.cutReport = {
+          cutType: 'SESION',
+          employeeName: this.session.employeeName,
+          periodFrom: this.session.openingDateTime,
+          periodTo: this.session.closingDateTime ?? this.session.openingDateTime,
+          openingAmount: this.session.openingAmount,
+          totalCashSales:    this.session.totalCashSales    ?? 0,
+          totalCashInflows:  this.session.totalCashInflows  ?? 0,
+          totalCashOutflows: this.session.totalCashOutflows ?? 0,
+          totalCashRefunds:  this.session.totalCashRefunds  ?? 0,
+          expectedCash:      this.session.expectedCash      ?? 0,
+          declaredCash:      this.session.declaredCash,
+          cashDifference:    this.session.cashDifference,
+          totalCardSales:    this.session.totalCardSales    ?? 0,
+          totalCardRefunds:  this.session.totalCardRefunds  ?? 0,
+          netCardTotal:     (this.session.totalCardSales    ?? 0) - (this.session.totalCardRefunds    ?? 0),
+          totalTransferSales:    this.session.totalTransferSales    ?? 0,
+          totalTransferRefunds:  this.session.totalTransferRefunds  ?? 0,
+          netTransferTotal:     (this.session.totalTransferSales    ?? 0) - (this.session.totalTransferRefunds ?? 0),
+          grandTotal: (this.session.expectedCash ?? 0)
+                  + (this.session.totalCardSales    ?? 0) - (this.session.totalCardRefunds    ?? 0)
+                  + (this.session.totalTransferSales ?? 0) - (this.session.totalTransferRefunds ?? 0)
+        };
         this.isLoading = false;
       }
     });

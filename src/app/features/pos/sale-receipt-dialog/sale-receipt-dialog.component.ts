@@ -51,7 +51,7 @@ template: `
         <div class="receipt-item">
           <div class="item-name">{{ item.productName }}</div>
           <div class="item-detail">
-            {{ item.quantity }} × {{ item.unitPrice | currency:'MXN':'symbol':'1.2-2' }}
+            {{ item.quantity }} {{ item.presentationAbbreviation }} × {{ item.unitPrice | currency:'MXN':'symbol':'1.2-2' }}
             @if (item.discount > 0) {
               <span class="item-discount">({{ item.discount }}% desc.)</span>
             }
