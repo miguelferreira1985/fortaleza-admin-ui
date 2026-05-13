@@ -21,8 +21,8 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   if (allowedRoles.length > 0) {
     const hasAccess = allowedRoles.some(role => userRoles.includes(role));
     if (!hasAccess) {
-      console.warn('Acceso denegado. Redirigiendo a /403');
-      router.navigate(['/dashboard']); // o dashboard si prefieres
+      console.warn('Acceso denegado. Redirigiendo a /dashboard');
+      router.navigate(['/dashboard']);
       return false;
     }
   }

@@ -35,6 +35,8 @@ export class ProductComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
+  private originalData: Product[] = [];
+
   dataSource = new MatTableDataSource<Product>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -124,7 +126,28 @@ export class ProductComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(): void {
-    this.dataSource.filter = this.searchTerm.trim().toLowerCase();
+    const searchValue = this.searchTerm.trim().toLowerCase();
+
+    if (!searchValue) {
+      this.dataSource.data = [...this.originalData];
+      this.dataSource.sort = this.sort;
+      if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
+      return;
+    }
+
+    this.dataSource.sort = null;
+
+    const filtered = this.originalData.filter(item => {
+      const name = item.name.toLowerCase();
+      const code = item.code.toLocaleLowerCase();
+      const subcategory = item.subcategory?.name?.toLowerCase() ?? '';
+
+      return name.includes(searchValue) || code.includes(searchValue) || subcategory.includes(searchValue);
+    });
+
+    const sorted = this.sortByRelevance(filtered, searchValue);
+    this.dataSource.data  = sorted;
+
     if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
   }
 
@@ -185,17 +208,26 @@ export class ProductComponent implements OnInit, AfterViewInit {
     return item.id ?? index;
   }
 
+  private sortByRelevance(products: Product[], searchTerm: string): Product[] {
+
+    return products.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const search = searchTerm.toLowerCase();
+      const aStarts = aName.startsWith(search);
+      const bStarts = bName.startsWith(search);
+
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      return aName.localeCompare(bName, 'es', { sensitivity: 'base' });
+    });
+  }
+
   private setProducts(data: Product[]): void {
-    this.dataSource.data = data ?? [];
+    this.originalData = [...data ?? []];
+    this.dataSource.data = this.originalData;
     this.totalItems = data?.length ?? 0;
-    this.dataSource.filterPredicate = (item: Product, filter: string) => {
-      const s = filter.toLowerCase();
-      return (
-        item.name.toLowerCase().includes(s) ||
-        item.code.toLowerCase().includes(s) ||
-        (item.subcategory?.name?.toLowerCase().includes(s) ?? false)
-      );
-    };
     this.isLoading = false;
   }
 
