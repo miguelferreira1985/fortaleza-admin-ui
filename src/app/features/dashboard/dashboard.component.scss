@@ -322,3 +322,83 @@
   justify-content: center;
   padding: 32px;
 }
+
+.stats-grid {
+  @media (max-width: 599px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+}
+
+// Stat card: más compacta en móvil
+.stat-card {
+  @media (max-width: 599px) {
+    mat-card-content {
+      padding: 14px !important;
+      gap: 10px;
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .stat-info {
+      .stat-label {
+        font-size: 0.72rem;
+      }
+
+      .stat-value {
+        font-size: 1.15rem;
+      }
+    }
+  }
+}
+
+// Dashboard grid: 1 columna en tablet también (mejor legibilidad)
+.dashboard-grid {
+  @media (max-width: 959px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Quick actions: 2 columnas siempre (se ve bien en cualquier tamaño)
+.quick-actions {
+  @media (max-width: 599px) {
+    gap: 8px;
+
+    button {
+      font-size: 0.8rem !important;
+      height: 44px !important; // Touch target cómodo
+    }
+  }
+}
+
+// Page header del dashboard en móvil
+.page-header {
+  @media (max-width: 599px) {
+    margin-bottom: 16px;
+
+    .page-title {
+      font-size: 1.3rem;
+
+      mat-icon {
+        font-size: 1.4rem;
+        width: 1.4rem;
+        height: 1.4rem;
+      }
+    }
+
+    .page-subtitle {
+      font-size: 0.8rem;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../shared/material-module';
 import { MatTableDataSource } from '@angular/material/table';
@@ -10,6 +10,9 @@ import { PresentationService } from '../../../core/services/presentation.service
 import { NotificationService } from '../../../core/services/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PresentationDialogComponent } from '../presentation-dialog/presentation-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-presentation.component',
@@ -21,11 +24,14 @@ import { PresentationDialogComponent } from '../presentation-dialog/presentation
   templateUrl: './presentation.component.html',
   styleUrl: './presentation.component.scss',
 })
-export class PresentationComponent implements OnInit, AfterViewInit {
+export class PresentationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private presentationService = inject(PresentationService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Presentation>([]);
 
@@ -36,10 +42,33 @@ export class PresentationComponent implements OnInit, AfterViewInit {
   isLoading: boolean = false;
   totalItems = 0;
 
-  displayedColumns: string[] = ['name', 'abbreviation', 'actions'];
+  readonly desktopCols = ['name', 'abbreviation', 'actions'];
+  readonly tabletCols = ['name', 'abbreviation', 'actions'];
+  readonly mobileCols = ['name', 'actions'];
 
-    ngOnInit(): void {
+  displayedColumns = this.desktopCols;
+
+  ngOnInit(): void {
     this.loadPresentations();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -80,11 +109,12 @@ export class PresentationComponent implements OnInit, AfterViewInit {
   }
 
   openCreateDialog(): void {
-    const dialogRef= this.dialog.open(PresentationDialogComponent, {
-      width: '500px',
-      data: { presentation: null, mode: 'create' },
-      disableClose: true
-    });
+    const dialogRef= this.dialog.open(PresentationDialogComponent,
+      dialogConfig('480px', {
+        data: { presentation: null, mode: 'create' },
+        disableClose: true
+      })
+    );
 
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) {
@@ -94,11 +124,12 @@ export class PresentationComponent implements OnInit, AfterViewInit {
   }
 
   openEditDialog(presentation: Presentation): void {
-    const dialogRef= this.dialog.open(PresentationDialogComponent, {
-      width: '500px',
-      data: { presentation: { ...presentation }, mode: 'edit' },
-      disableClose: true
-    });
+    const dialogRef= this.dialog.open(PresentationDialogComponent,
+      dialogConfig('500px', {
+        data: { presentation: { ...presentation }, mode: 'edit' },
+        disableClose: true
+      })
+    );
 
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) {

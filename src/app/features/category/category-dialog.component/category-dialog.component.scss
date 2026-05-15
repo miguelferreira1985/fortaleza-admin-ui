@@ -23,9 +23,9 @@
   padding: 1rem 0;
   min-width: 420px;
 
-  @media (max-width: 600px) {
-    min-width: unset;
-    width: 100%;
+  @media (max-width: 599px) {
+    min-width: unset !important;
+    padding:  0.5rem 0;
   }
 }
 
@@ -46,7 +46,7 @@
     min-width: 100px;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 599px) {
     flex-direction: column-reverse;
 
     button {

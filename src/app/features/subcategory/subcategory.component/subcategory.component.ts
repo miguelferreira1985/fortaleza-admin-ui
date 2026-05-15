@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
 import { FormsModule } from '@angular/forms';
 import { SubcategoryService } from '../../../core/services/subcategory.service';
@@ -10,6 +10,9 @@ import { Subcategory } from '../../../shared/models/subcategory';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SubcategoryDialogComponent } from '../subcategory-dialog.component/subcategory-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-subcategory.component',
@@ -21,11 +24,14 @@ import { SubcategoryDialogComponent } from '../subcategory-dialog.component/subc
   templateUrl: './subcategory.component.html',
   styleUrl: './subcategory.component.scss',
 })
-export class SubcategoryComponent {
+export class SubcategoryComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subcategoryService = inject(SubcategoryService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Subcategory>([]);
 
@@ -36,10 +42,32 @@ export class SubcategoryComponent {
   isLoading = false;
   totalItems = 0;
 
-  displayedColumns: string[] = ['name', 'description', 'category', 'actions'];
+  readonly desktopCols = ['name', 'description', 'category', 'actions'];
+  readonly tabletCols  = ['name', 'category', 'actions'];
+  readonly mobileCols  = ['name', 'actions'];
+  displayedColumns = this.desktopCols
 
   ngOnInit(): void {
     this.loadSubcategories();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -76,22 +104,24 @@ export class SubcategoryComponent {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(SubcategoryDialogComponent, {
-      width: '520px',
-      data: { subcategory: null },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(SubcategoryDialogComponent,
+      dialogConfig('500px', {
+        data: { subcategory: null },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadSubcategories();
     });
   }
 
   openEditDialog(subcategory: Subcategory): void {
-    const dialogRef = this.dialog.open(SubcategoryDialogComponent, {
-      width: '520px',
-      data: { subcategory: { ...subcategory } },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(SubcategoryDialogComponent,
+      dialogConfig('500px', {
+        data: { subcategory: { ...subcategory } },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadSubcategories();
     });
