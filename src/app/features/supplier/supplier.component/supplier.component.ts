@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
 import { FormsModule } from '@angular/forms';
 import { HasRoleDirective } from '../../../core/directives/has-role.directive';
@@ -12,6 +12,9 @@ import { Supplier } from '../../../shared/models/supplier';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { SupplierDialogComponent } from '../supplier-dialog.component/supplier-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-supplier.component',
@@ -24,12 +27,15 @@ import { SupplierDialogComponent } from '../supplier-dialog.component/supplier-d
   templateUrl: './supplier.component.html',
   styleUrl: './supplier.component.scss',
 })
-export class SupplierComponent implements OnInit, AfterViewInit {
+export class SupplierComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private supplierService = inject(SupplierService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Supplier>([]);
 
@@ -41,10 +47,32 @@ export class SupplierComponent implements OnInit, AfterViewInit {
   totalItems = 0;
   showActive = true;
 
-  displayedColumns: string[] = ['name', 'contact', 'email', 'location', 'actions'];
+  readonly desktopCols = ['name', 'contact', 'email', 'location', 'actions'];
+  readonly tabletCols  = ['name', 'contact', 'actions'];
+  readonly mobileCols  = ['name', 'actions'];
+  displayedColumns = this.desktopCols
 
   ngOnInit(): void {
     this.loadSuppliers();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -88,24 +116,24 @@ export class SupplierComponent implements OnInit, AfterViewInit {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(SupplierDialogComponent, {
-      width: '650px',
-      maxWidth: '95vw',
-      data: { supplier: null },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(SupplierDialogComponent,
+      dialogConfig('650px', {
+        data: { supplier: null },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadSuppliers();
     });
   }
 
   openEditDialog(supplier: Supplier): void {
-    const dialogRef = this.dialog.open(SupplierDialogComponent, {
-      width: '650px',
-      maxWidth: '95vw',
-      data: { supplier: { ...supplier } },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(SupplierDialogComponent,
+      dialogConfig('650px', {
+        data: { supplier: { ...supplier } },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadSuppliers();
     });

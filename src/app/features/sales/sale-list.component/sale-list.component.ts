@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MaterialModule } from '../../../shared/material-module';
-import { HasRoleDirective } from '../../../core/directives/has-role.directive';
 import { SaleService } from '../../../core/services/sale.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SaleResponse, SaleStatus } from '../../../shared/models/sale.models';
 import { getSaleStatusConfig } from '../../../core/utils/sale-status.util';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscriber, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-sale-list',
@@ -18,16 +19,18 @@ import { getSaleStatusConfig } from '../../../core/utils/sale-status.util';
   imports: [
     CommonModule,
     FormsModule,
-    MaterialModule,
-    HasRoleDirective],
+    MaterialModule
+  ],
   templateUrl: './sale-list.component.html',
   styleUrl: './sale-list.component.scss'
 })
-export class SaleListComponent implements OnInit, AfterViewInit {
+export class SaleListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private saleService = inject(SaleService);
-  private notify      = inject(NotificationService);
   private router      = inject(Router);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<SaleResponse>([]);
 
@@ -48,13 +51,32 @@ export class SaleListComponent implements OnInit, AfterViewInit {
     { value: 'DEVUELTA_PARCIAL',label: 'Dev. parciales' }
   ];
 
-  displayedColumns: string[] = [
-    'folio', 'saleDate', 'employeeName', 'clientName',
-    'total', 'payments', 'status', 'actions'
-  ];
+  readonly desktopCols = ['folio', 'saleDate', 'employeeName', 'clientName', 'total', 'payments', 'status', 'actions'];
+  readonly tabletCols  = ['folio', 'saleDate', 'total', 'status', 'actions'];
+  readonly mobileCols  = ['folio', 'total', 'actions'];
+  displayedColumns = this.desktopCols;
 
   ngOnInit(): void {
     this.loadSales();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {

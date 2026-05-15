@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../../core/services/employee.service';
@@ -11,6 +11,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { EmployeeDialogComponent } from '../employee-dialog.component/employee-dialog.component';
 import { HasRoleDirective } from '../../../core/directives/has-role.directive';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-employee.component',
@@ -23,11 +26,14 @@ import { HasRoleDirective } from '../../../core/directives/has-role.directive';
   templateUrl: './employee.component.html',
   styleUrl: './employee.component.scss',
 })
-export class EmployeeComponent {
+export class EmployeeComponent implements OnInit, OnDestroy, AfterViewInit{
 
   private employeeService = inject(EmployeeService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Employee>([]);
 
@@ -39,10 +45,32 @@ export class EmployeeComponent {
   totalItems = 0;
   showActive = true;
 
-  displayedColumns: string[] = ['name', 'phone', 'email', 'user', 'status', 'actions'];
+  readonly desktopCols = ['name', 'phone', 'email', 'user', 'status', 'actions'];
+  readonly tabletCols  = ['name', 'phone', 'status', 'actions'];
+  readonly mobileCols  = ['name', 'status', 'actions'];
+  displayedColumns = this.desktopCols
 
   ngOnInit(): void {
     this.loadEmployees();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -86,24 +114,24 @@ export class EmployeeComponent {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(EmployeeDialogComponent, {
-      width: '700px',
-      maxWidth: '95vw',
-      data: { employee: null },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(EmployeeDialogComponent,
+      dialogConfig('700px', {
+        data: { employee: null },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadEmployees();
     });
   }
 
   openEditDialog(employee: Employee): void {
-    const dialogRef = this.dialog.open(EmployeeDialogComponent, {
-      width: '700px',
-      maxWidth: '95vw',
-      data: { employee: { ...employee } },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(EmployeeDialogComponent,
+      dialogConfig('700px', {
+        data: { employee: { ...employee } },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadEmployees();
     });

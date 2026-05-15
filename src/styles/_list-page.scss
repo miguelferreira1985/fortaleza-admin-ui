@@ -1,0 +1,106 @@
+// =============================================================
+// _list-page.scss — Estilos responsivos compartidos
+// Importar en cualquier componente que tenga el patrón
+// toolbar + tabla (categorías, productos, clientes, etc.)
+//
+// Uso en el componente:
+//   @use 'styles/list-page' as *;
+// =============================================================
+
+// ── Page header ───────────────────────────────────────────────
+.page-header {
+  @media (max-width: 599px) {
+    margin-bottom: 0.75rem;
+
+    h1 {
+      font-size: 1.25rem !important;
+
+      mat-icon {
+        font-size: 1.3rem !important;
+        width: 1.3rem !important;
+        height: 1.3rem !important;
+      }
+    }
+  }
+}
+
+// ── Content card ──────────────────────────────────────────────
+.content-card {
+  @media (max-width: 599px) {
+    max-height: none !important;
+    border-radius: 8px !important;
+  }
+}
+
+// ── Toolbar ───────────────────────────────────────────────────
+.toolbar {
+  @media (max-width: 599px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+
+    .toolbar-left {
+      flex-wrap: wrap;
+
+      h2 {
+        font-size: 1rem;
+      }
+    }
+
+    .toolbar-right {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 959px) {
+    padding: 1rem 1.25rem;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Campo de búsqueda ─────────────────────────────────────────
+.search-field {
+  @media (max-width: 599px) {
+    width: 100% !important;
+  }
+
+  @media (min-width: 600px) and (max-width: 959px) {
+    width: 220px;
+  }
+}
+
+// ── Botón agregar ─────────────────────────────────────────────
+.add-button {
+  @media (max-width: 599px) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ── Filter button (activos/inactivos) ─────────────────────────
+.filter-btn {
+  @media (max-width: 599px) {
+    height: 36px;
+    font-size: 0.8rem;
+  }
+}
+
+// ── Tabla ─────────────────────────────────────────────────────
+.table-scroll {
+  @media (max-width: 959px) {
+    overflow-x: auto;
+    max-height: none !important;
+  }
+}
+
+// ── Paginador ─────────────────────────────────────────────────
+mat-paginator {
+  @media (max-width: 599px) {
+    ::ng-deep .mat-mdc-paginator-page-size {
+      display: none !important;
+    }
+  }
+}

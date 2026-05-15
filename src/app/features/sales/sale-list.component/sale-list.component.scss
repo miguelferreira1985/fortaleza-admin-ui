@@ -120,3 +120,64 @@
 }
 
 mat-paginator { border-top: 1px solid #fce4ec; background: #fff5f8; flex-shrink: 0; }
+
+// ===== RESPONSIVE =====
+@media (max-width: 599px) {
+
+  .page-header h1 {
+    font-size: 1.25rem;
+    mat-icon { font-size: 1.3rem; width: 1.3rem; height: 1.3rem; }
+  }
+
+  .content-card { max-height: none !important; }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+
+    // El filtro de estado queda arriba junto al badge
+    .toolbar-left {
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .toolbar-right {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.6rem;
+    }
+
+    // El select de estado ocupa todo el ancho en móvil
+    .status-filter { width: 100% !important; }
+  }
+
+  .search-field { width: 100% !important; }
+
+  .add-button { width: 100%; height: 48px; }
+
+  .table-scroll {
+    overflow-x: auto;
+    max-height: none !important;
+  }
+
+  .sales-table {
+    font-size: 0.85rem;
+    th, td { padding: 0.6rem 0.5rem; }
+  }
+}
+
+@media (min-width: 600px) and (max-width: 959px) {
+
+  .toolbar {
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
+    .toolbar-right { justify-content: space-between; }
+    .status-filter { width: 140px; }
+  }
+
+  .search-field { width: 200px; }
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../../shared/material-module';
 import { HasRoleDirective } from '../../../core/directives/has-role.directive';
@@ -14,6 +14,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Supplier } from '../../../shared/models/supplier';
 import { StockDialogComponent } from '../stock-dialog.component/stock-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-product.component',
@@ -27,14 +30,16 @@ import { StockDialogComponent } from '../stock-dialog.component/stock-dialog.com
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
-export class ProductComponent implements OnInit, AfterViewInit {
+export class ProductComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private productService = inject(ProductService);
   private supplierService = inject(SupplierService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private breakpoint = inject(BreakpointObserver);
 
+  private subs = new Subscription();
   private originalData: Product[] = [];
 
   dataSource = new MatTableDataSource<Product>([]);
@@ -53,10 +58,10 @@ export class ProductComponent implements OnInit, AfterViewInit {
   filteredSuppliers: Supplier[] = [];
   selectedSupplierId: number | null = null;
 
-  displayedColumns: string[] = [
-    'code', 'name', 'stock', 'cost', 'price',
-    'presentation', 'category', 'actions'
-  ];
+  readonly desktopCols = ['code', 'name', 'stock', 'cost', 'price', 'presentation', 'category', 'actions'];
+  readonly tabletCols  = ['name', 'stock', 'price', 'actions'];
+  readonly mobileCols  = ['name', 'stock', 'actions'];
+  displayedColumns = this.desktopCols
 
   ngOnInit(): void {
     this.loadSuppliers();
@@ -71,6 +76,25 @@ export class ProductComponent implements OnInit, AfterViewInit {
         this.filteredSuppliers = this.allSuppliers;
       }
     });
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -160,11 +184,12 @@ export class ProductComponent implements OnInit, AfterViewInit {
   }
 
   openStockDialog(product: Product): void {
-    this.dialog.open(StockDialogComponent, {
-      width: '500px',
-      data: { product },
-      disableClose: true
-    }).afterClosed().subscribe(success => {
+    this.dialog.open(StockDialogComponent,
+      dialogConfig('500px', {
+        data: { product },
+        disableClose: true
+      })
+    ).afterClosed().subscribe(success => {
       if (success) this.loadProducts();
     });
   }
