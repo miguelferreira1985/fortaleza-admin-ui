@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../shared/material-module';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../core/services/product.service';
@@ -9,7 +9,8 @@ import { InventoryMovement } from '../../shared/models/inventory-movement';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Product } from '../../shared/models/product';
-import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, Subscription } from 'rxjs';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-inventory-movement.component',
@@ -22,10 +23,13 @@ import { debounceTime, distinctUntilChanged, startWith } from 'rxjs';
   templateUrl: './inventory-movement.component.html',
   styleUrl: './inventory-movement.component.scss',
 })
-export class InventoryMovementComponent implements OnInit, AfterViewInit{
+export class InventoryMovementComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private productService = inject(ProductService);
   private inventoryMovementService = inject(InventoryMovementService);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<InventoryMovement>([]);
 
@@ -49,16 +53,11 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
     { value: 'DEVOLUCION', label: 'Devolución' }
   ];
 
-  displayedColumns: string[] = [
-    'productCode',
-    'previousStock',
-    'quantity',
-    'newStock',
-    'movementType',
-    'description',
-    'createdBy',
-    'movementDate'
-  ];
+  readonly desktopCols = ['productCode', 'previousStock', 'quantity', 'newStock', 'movementType', 'description', 'createdBy', 'movementDate'];
+  readonly tabletCols  = ['productCode', 'quantity', 'movementType', 'movementDate'];
+  readonly mobileCols  = ['productCode', 'quantity', 'movementType'];
+
+  displayedColumns = this.desktopCols;
 
   ngOnInit(): void {
     this.loadProducts();
@@ -67,7 +66,26 @@ export class InventoryMovementComponent implements OnInit, AfterViewInit{
 
     this.movementTypeControl.valueChanges.subscribe(() => {
       this.loadMovements()
-    })
+    });
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {

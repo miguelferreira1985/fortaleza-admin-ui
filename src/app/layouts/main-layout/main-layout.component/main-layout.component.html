@@ -1,7 +1,10 @@
 <mat-sidenav-container class="app-container">
 
   <!-- ===== SIDEBAR ===== -->
-  <mat-sidenav #sidenav mode="side" opened class="app-sidenav">
+  <mat-sidenav #sidenav
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="!isMobile"
+    class="app-sidenav">
 
     <!-- Logo / Brand -->
     <div class="sidenav-brand" routerLink="/dashboard">
@@ -193,7 +196,7 @@
             <!-- Avatar con iniciales -->
             <span class="user-btn-content">
               <span class="user-avatar">{{ currentUser.initials }}</span>
-              <span class="user-anem">{{ currentUser.fullName }}</span>
+              <span class="user-name hide-on-mobile">{{ currentUser.fullName }}</span>
               <mat-icon>arrow_drop_down</mat-icon>
             </span>
 
@@ -241,7 +244,10 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <span><strong>Copyright © 2025 La Fortaleza ADMIN v1.3.0.</strong> Todos los derechos reservados.</span>
+      <span class="footer-copy">
+        <strong>La Fortaleza Admin v1.3.0</strong>
+        <span class="footer-rights">Todos los derechos reservados</span>
+      </span>
       <span class="footer-verse">Colosenses 3:23-24 🙏</span>
     </footer>
 

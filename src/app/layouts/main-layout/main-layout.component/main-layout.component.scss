@@ -11,6 +11,10 @@
   display: flex;
   flex-direction: column;
   border-right: 1px solid #f8bbd0 !important;
+
+  @media (max-width: 599px) {
+    box-shadow: 4px 0 16px rgba(0,0,0,0.15) !important;
+  }
 }
 
 // Logo / Brand
@@ -199,6 +203,14 @@ mat-divider {
 .page-content {
   flex: 1;
   padding: 24px;
+
+  @media (max-width: 599px) {
+    padding: 12px 10px;
+  }
+
+  @media ((min-width: 600px) and (max-width: 959px)) {
+    padding: 16px;
+  }
 }
 
 // ===== FOOTER =====
@@ -217,10 +229,15 @@ mat-divider {
     color: #e91e63;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 599px) {
     flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 2px;
     text-align: center;
+
+    .footer-verse {
+      font-size: 0.7rem;
+    }
   }
 }
 
@@ -261,11 +278,6 @@ mat-divider {
   font-weight: 500;
   font-size: 0.9rem;
   color: #880e4f;
-
-  // Ocultat en pantallas chicas
-  @media (max-width: 600px) {
-    display: none;
-  }
 }
 
 // Header del menú desplegable
@@ -315,6 +327,12 @@ mat-divider {
 
   mat-icon {
     color: #c62828;
+  }
+}
+
+.hide-on-mobile {
+  @media (max-width: 599px) {
+    display: none !important;
   }
 }
 

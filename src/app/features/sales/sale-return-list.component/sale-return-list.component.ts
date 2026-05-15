@@ -1,7 +1,7 @@
 // return-list.component.ts  →  features/pos/return-list/return-list.component.ts
 
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -13,9 +13,11 @@ import { HasRoleDirective } from '../../../core/directives/has-role.directive';
 import { SaleService } from '../../../core/services/sale.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SaleReturnResponse, ReturnType } from '../../../shared/models/sale.models';
-import { SaleReturnDialogComponent } from '../sale-return-dialog.component/sale-return-dialog.component';
 import { FreeReturnDialogComponent } from '../free-return-dialog.component/free-return-dialog.component';
 import { SaleReturnReceiptDialogComponent } from '../sale-return-receipt-dialog.component/sale-return-receipt-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-return-list',
@@ -30,12 +32,14 @@ import { SaleReturnReceiptDialogComponent } from '../sale-return-receipt-dialog.
   templateUrl: './sale-return-list.component.html',
   styleUrl: './sale-return-list.component.scss'
 })
-export class SaleReturnListComponent implements OnInit, AfterViewInit {
+export class SaleReturnListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private saleService = inject(SaleService);
-  private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<SaleReturnResponse>([]);
 
@@ -54,13 +58,33 @@ export class SaleReturnListComponent implements OnInit, AfterViewInit {
     { value: 'FREE',    label: 'Sin ticket'      }
   ];
 
-  displayedColumns = [
-    'folio', 'returnDate', 'employeeName',
-    'saleFolio', 'returnType', 'totalRefunded',
-    'refundMethod', 'actions'
-  ];
+  readonly desktopCols = ['folio', 'returnDate', 'employeeName', 'saleFolio', 'returnType', 'totalRefunded', 'refundMethod', 'actions'];
+  readonly tabletCols  = ['folio', 'returnDate', 'returnType', 'totalRefunded', 'actions'];
+  readonly mobileCols  = ['folio', 'totalRefunded', 'actions'];
+  displayedColumns = this.desktopCols;
 
-  ngOnInit(): void { this.loadReturns(); }
+  ngOnInit(): void {
+    this.loadReturns();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -90,10 +114,11 @@ export class SaleReturnListComponent implements OnInit, AfterViewInit {
   }
 
   openFreeReturnDialog(): void {
-    this.dialog.open(FreeReturnDialogComponent, {
-      width: '500px',
-      disableClose: true
-    }).afterClosed().subscribe(success => {
+    this.dialog.open(FreeReturnDialogComponent,
+      dialogConfig('500px', {
+        disableClose: true
+      })
+    ).afterClosed().subscribe(success => {
       if (success) this.loadReturns();
     });
   }

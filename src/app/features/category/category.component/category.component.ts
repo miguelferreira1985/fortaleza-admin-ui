@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { AfterContentChecked, AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
 import { FormsModule } from '@angular/forms';
 import { CategoryService } from '../../../core/services/category.service';
@@ -10,6 +10,9 @@ import { Category } from '../../../shared/models/category';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { CategoryDialogComponent } from '../category-dialog.component/category-dialog.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-category.component',
@@ -21,11 +24,14 @@ import { CategoryDialogComponent } from '../category-dialog.component/category-d
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss',
 })
-export class CategoryComponent {
+export class CategoryComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private categoryService = inject(CategoryService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Category>([]);
 
@@ -36,10 +42,32 @@ export class CategoryComponent {
   isLoading: boolean = false;
   totalItems = 0;
 
-  displayedColumns: string[] = ['name', 'description', 'actions'];
+  readonly desktopCols = ['name', 'description', 'actions'];
+  readonly tabletCols = ['name', 'description', 'actions'];
+  readonly mobileCols = ['name', 'actions'];
+  displayedColumns = this.desktopCols;
 
-    ngOnInit(): void {
+  ngOnInit(): void {
     this.loadCategories();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -79,11 +107,12 @@ export class CategoryComponent {
   }
 
   openCreateDialog(): void {
-    const dialogRef= this.dialog.open(CategoryDialogComponent, {
-      width: '500px',
-      data: { category: null, mode: 'create' },
-      disableClose: true
-    });
+    const dialogRef= this.dialog.open(CategoryDialogComponent,
+      dialogConfig('500px', {
+        data: { category: null, mode: 'create' },
+        disableClose: true
+      })
+    );
 
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) {
@@ -93,18 +122,17 @@ export class CategoryComponent {
   }
 
   openEditDialog(category: Category): void {
-    const dialogRef= this.dialog.open(CategoryDialogComponent, {
-      width: '500px',
-      data: { category: { ...category }, mode: 'edit' },
-      disableClose: true
-    });
-
+    const dialogRef = this.dialog.open(CategoryDialogComponent,
+      dialogConfig('500px', {
+        data: { category: { ...category }, mode: 'edit' },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
-      if (success) {
-        this.loadCategories();
-      }
+      if (success) this.loadCategories();
     });
   }
+
 
   deleteCategory(category: Category): void {
     this.notify.confirm('¿Estás seguro?', `¿Deseas eliminar la categoría "${category.name}"? Esta acción no se puede deshacer.`)

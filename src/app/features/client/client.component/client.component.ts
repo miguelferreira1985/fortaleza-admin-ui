@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MaterialModule } from '../../../shared/material-module';
 import { FormsModule } from '@angular/forms';
 import { ClientService } from '../../../core/services/client.service';
@@ -11,6 +11,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { ClientDialogComponent } from '../client-dialog.component/client-dialog.component';
 import { HasRoleDirective } from '../../../core/directives/has-role.directive';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subscription } from 'rxjs';
+import { dialogConfig } from '../../../core/utils/dialog.util';
 
 @Component({
   selector: 'app-client.component',
@@ -23,11 +26,14 @@ import { HasRoleDirective } from '../../../core/directives/has-role.directive';
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss',
 })
-export class ClientComponent {
+export class ClientComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private clientService = inject(ClientService);
   private notify = inject(NotificationService);
   private dialog = inject(MatDialog);
+  private breakpoint = inject(BreakpointObserver);
+
+  private subs = new Subscription();
 
   dataSource = new MatTableDataSource<Client>([]);
 
@@ -37,12 +43,35 @@ export class ClientComponent {
   searchTerm = '';
   isLoading = false;
   totalItems = 0;
-  showActive = true; // 👈 Filtro activos/inactivos
+  showActive = true;
 
-  displayedColumns: string[] = ['name', 'rfc', 'phone', 'status', 'actions'];
+  readonly desktopCols = ['name', 'rfc', 'phone', 'status', 'actions'];
+  readonly tabletCols  = ['name', 'rfc', 'status', 'actions'];
+  readonly mobileCols  = ['name', 'status', 'actions'];
+
+  displayedColumns = this.desktopCols
 
   ngOnInit(): void {
     this.loadClients();
+
+    this.subs.add(
+      this.breakpoint.observe([
+        '(max-width: 599px)',
+        '(min-width: 600px) and (max-width: 959px)'
+      ]).subscribe(result => {
+        if (result.breakpoints['(max-width: 599px)']) {
+          this.displayedColumns = this.mobileCols;
+        } else if (result.breakpoints['(min-width: 600px) and (max-width: 959px)']) {
+          this.displayedColumns = this.tabletCols;
+        } else {
+          this.displayedColumns = this.desktopCols;
+        }
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   ngAfterViewInit(): void {
@@ -86,22 +115,24 @@ export class ClientComponent {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(ClientDialogComponent, {
-      width: '500px',
-      data: { client: null },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(ClientDialogComponent,
+      dialogConfig('500px', {
+        data: { client: null },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadClients();
     });
   }
 
   openEditDialog(client: Client): void {
-    const dialogRef = this.dialog.open(ClientDialogComponent, {
-      width: '500px',
-      data: { client: { ...client } },
-      disableClose: true
-    });
+    const dialogRef = this.dialog.open(ClientDialogComponent,
+      dialogConfig('500px', {
+        data: { client: { ...client } },
+        disableClose: true
+      })
+    );
     dialogRef.afterClosed().subscribe((success: boolean) => {
       if (success) this.loadClients();
     });
